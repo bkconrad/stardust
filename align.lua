@@ -27,7 +27,15 @@ function extents(object)
 			maxy = math.max(maxy, p.y)
 		end
 	elseif type(points) == "point" then
-		local r = object:getRad()
+		local r
+
+		-- check if the object has getRad
+		if object.getRad then
+			r = object:getRad()
+		else
+			r = 0
+		end
+
 		minx = points.x - r
 		maxx = points.x + r
 		miny = points.y - r
@@ -85,7 +93,14 @@ function halfSize(object)
 		local ext = extents(object)
 		result = point.new((ext.maxx - ext.minx) / 2, (ext.maxy - ext.miny) / 2)
 	elseif type(geom) == "point" then
-		result = point.new(object:getRad(), object:getRad())
+		local r
+		-- check if the object has getRad
+		if object.getRad then
+			r = object:getRad()
+		else
+			r = 0
+		end
+		result = point.new(r, r)
 	end
 	return result
 end
