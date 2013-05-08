@@ -5,10 +5,10 @@
 function getArgsMenu()
 
 	menu = 	{
-		ToggleMenuItem.new("Horizontal Alignment", {"Left", "Center", "Right", "Top", "Middle", "Bottom"})
+		ToggleMenuItem.new("Alignment", {"Left", "Center", "Right", "Top", "Middle", "Bottom"})
 	}
 
-	return "Alignment", menu
+	return "Align Objects", menu
 end
 
 -- return the extents of the given object

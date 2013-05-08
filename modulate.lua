@@ -40,10 +40,10 @@ end
 function getArgsMenu()
 
 	menu = 	{
-		TextEntryMenuItem.new("Equation",   "sin(t*TAU*pow(2,i-1))*a/pow(2,i-1)*(RAND-0.5)", "", 256, "offset tangent to each vertex"),
-		CounterMenuItem.new("subdivisions",  32, 1,       1,    0xFFFF, "", "", "Number of points in the generated objects"),
-		CounterMenuItem.new("iterations",  1, 1,       1,    0xFF, "", "", "Width of wall if BarrierMaker is selected below"),
-		CounterMenuItem.new("power",  20, 1,       1,    0xFF, "", "", "Width of wall if BarrierMaker is selected below"),
+		TextEntryMenuItem.new("Equation",   "sin(t*TAU*pow(2,i-1))*a/pow(2,i-1)*(RAND-0.5)", "", 256, "Offset perpendicular to each vertex as a function of t"),
+		CounterMenuItem.new("Subdivisions",  32, 1,       1,    0xFFFF, "", "", "Number of points in the generated objects"),
+		CounterMenuItem.new("Iterations",  1, 1,       1,    0xFF, "", "", "Additive iterations of the specified function"),
+		CounterMenuItem.new("Bezier Power",  20, 1,       1,    0xFF, "", "No Bezier fitting", "Strength of Bezier curve fitting"),
 	}
 
 	for index, var in ipairs(CONVENIENCE_VARIABLES) do
@@ -51,7 +51,7 @@ function getArgsMenu()
 			TextEntryMenuItem.new(var,   "1", "1", 256, "Value of convenience variable " .. var)
 		)
 	end
-	return "Function to Polygon", menu
+	return "Modulate Polygon", menu
 end
 
 function valueOf(str)

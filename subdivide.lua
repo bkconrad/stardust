@@ -11,7 +11,7 @@ function getArgsMenu()
 		YesNoMenuItem.new("Subdivide Completely? ",  2, "Divide until all segments are below size threshold"),
 	}
 
-	return "Function to Polygon", menu
+	return "Subdivide", menu
 end
 
 function midPoint(p1, p2)
