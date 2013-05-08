@@ -1,5 +1,5 @@
 -- Polygon subdivision
--- Subdivide (a.k.a round) polygons using recursive fixed midpoint vertex
+-- Subdivide (a.k.a round) polygons using multi-pass fixed midpoint vertex
 -- insertion and gaussian first-order vertex smoothing
 -- This work is released into the public domain
 -- Authored by kaen
