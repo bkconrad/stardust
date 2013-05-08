@@ -174,36 +174,28 @@ function modulatePolyline(poly, equation, subdivisions, iterations, power)
 		table.insert(randoms, math.random(0, 100) / 100)
 	end
 
-	local t = 0.0
-	while t < 1.0 do
-
+	for i, p in ipairs(poly) do
 		-- find the segment in which t lies
 		local segment, segmentStart, segmentEnd
 		local traversedLength = 0
 		for k = 2, #poly do
-			segmentStart = traversedLength / totalLength
 			traversedLength = traversedLength + point.length(poly[k] - poly[k - 1])
-			segmentEnd = traversedLength / totalLength
-			if (traversedLength / totalLength) >= t then
-				segment = k - 1
+			if k == i then
 				break
 			end
 		end
+		t = traversedLength / totalLength
 
-		local segment_t = (t - segmentStart) / (segmentEnd - segmentStart)
-		local basePoint = evaluateCubicBezier(poly, segment, segment_t, power)
-		local tangent = findBezierTangent(poly, segment, segment_t, power)
+		local tangent = findSlope(poly, i)
 		local inverseTangent = point.normalize(point.new(tangent.y, -tangent.x))
 
-		local newPoint = basePoint
+		local newPoint = p
 		for i = 1, iterations do
 			EVALUATE_CONTEXT["RAND"] = randoms[i]
 			newPoint = newPoint + inverseTangent * evaluate(equation, t, i)
 		end
 
 		table.insert(newPoly, newPoint)
-
-		t = t + (1.0/subdivisions)
 	end
 
 	-- if the input poly is closed, close the output poly
@@ -212,6 +204,12 @@ function modulatePolyline(poly, equation, subdivisions, iterations, power)
 	end
 
 	return newPoly
+end
+
+-- returns the average slope for vertex i
+function findSlope(poly, i)
+	local points = getPoints(poly, i - 1, 3)
+	return ((points[2] - points[1]) + (points[3] - points[2])) / 2
 end
 
 function main()
