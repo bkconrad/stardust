@@ -115,13 +115,16 @@ end
 
 -- returns point evaluating a cubic bezier at time t
 function evaluateCubicBezier(poly, start, t, power)
-	local pa, pb, pc, pd, x, y, a, b, i1, i2, i3
+	local pa, pb, pc, pd, x, y, a, b, i1, i2, i3, meana, meanb
 
 	local points = getPoints(poly, start - 1, 4)
 
+	meana = ((points[2] - points[1]) + (points[3] - points[2])) / 2
+	meanb = ((points[4] - points[3]) + (points[3] - points[2])) / 2
+
 	pa = points[2]
-	pb = points[2] + point.normalize(points[2] - points[1]) * point.distanceTo(points[2], points[3]) * power
-	pc = points[3] + point.normalize(points[3] - points[4]) * point.distanceTo(points[2], points[3]) * power
+	pb = points[2] + point.normalize(meana) * point.distanceTo(points[2], points[3]) * power
+	pc = points[3] - point.normalize(meanb) * point.distanceTo(points[2], points[3]) * power
 	pd = points[3]
 
 	a = 1 - t
