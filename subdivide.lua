@@ -8,7 +8,7 @@ function getArgsMenu()
 
 	menu = 	{
 		CounterMenuItem.new("Size Threshold: ",  32, 1,       1,    0xFFFF, "", "", "max distance between points"),
-		YesNoMenuItem.new("All the way? ",  2, "Divide until all segments are below size threshold"),
+		YesNoMenuItem.new("Subdivide Completely? ",  2, "Divide until all segments are below size threshold"),
 	}
 
 	return "Function to Polygon", menu
@@ -128,12 +128,10 @@ function main()
 	local objects = plugin:getSelectedObjects()
 
 	for k, v in pairs(objects) do
-		if type(v:getGeom()) ~= "table" then
-			next()
+		if type(v:getGeom()) == "table" then
+			newGeom = subdividePolyline(v:getGeom(), maxDistance, completely == "Yes")
+			v:setGeom(newGeom)
 		end
-
-		newGeom = subdividePolyline(v:getGeom(), maxDistance, completely == "Yes")
-		v:setGeom(newGeom)
 	end
 end   
 
