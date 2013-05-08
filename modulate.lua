@@ -4,13 +4,6 @@
 -- Adaptations are released into the public domain
 -- Authored by kaen
 
---
--- If this function exists, it should return a list of menu items that can be used to build an options menu
--- If this function is not implemented, or returns nil, the menu will not be displayed, and main() will be
--- run without args
---
--- For a full list of the menu widgets available, see the Bitfighter wiki on bitfighter.org
---
 CONVENIENCE_VARIABLES = {
 	"a",
 	"b",
@@ -41,9 +34,7 @@ function getArgsMenu()
 
 	menu = 	{
 		TextEntryMenuItem.new("Equation",   "sin(t*TAU*pow(2,i-1))*a/pow(2,i-1)*(RAND-0.5)", "", 256, "Offset perpendicular to each vertex as a function of t"),
-		CounterMenuItem.new("Subdivisions",  32, 1,       1,    0xFFFF, "", "", "Number of points in the generated objects"),
 		CounterMenuItem.new("Iterations",  1, 1,       1,    0xFF, "", "", "Additive iterations of the specified function"),
-		CounterMenuItem.new("Bezier Power",  20, 1,       1,    0xFF, "", "No Bezier fitting", "Strength of Bezier curve fitting"),
 	}
 
 	for index, var in ipairs(CONVENIENCE_VARIABLES) do
@@ -54,25 +45,8 @@ function getArgsMenu()
 	return "Modulate Polygon", menu
 end
 
-function valueOf(str)
-	return loadstring('return ' .. str)()
-end
-
-function typeName(classId)
-	for k, v in ipairs(ObjType) do
-		if v == classId then
-			return k
-		end
-	end
-end
-
 function midPoint(p1, p2)
 	return point.new((p1.x + p2.x) / 2, (p1.y + p2.y) / 2)
-end
-
--- returns a point p3 such that (p3 - p2) == (p2 - p1)
-function extrude(p1, p2)
-	return p2 + p2 - p1
 end
 
 -- return point i from poly, handling bounds crossing appropriately depending
@@ -113,43 +87,8 @@ function getPoints(poly, start, n)
 	return points
 end
 
--- returns point evaluating a cubic bezier at time t
-function evaluateCubicBezier(poly, start, t, power)
-	local pa, pb, pc, pd, x, y, a, b, i1, i2, i3, meana, meanb
 
-	local points = getPoints(poly, start - 1, 4)
-
-	meana = ((points[2] - points[1]) + (points[3] - points[2])) / 2
-	meanb = ((points[4] - points[3]) + (points[3] - points[2])) / 2
-
-	pa = points[2]
-	pb = points[2] + point.normalize(meana) * point.distanceTo(points[2], points[3]) * power
-	pc = points[3] - point.normalize(meanb) * point.distanceTo(points[2], points[3]) * power
-	pd = points[3]
-
-	a = 1 - t
-	b = t
-	x = pa.x*a*a*a + 3*pb.x*a*a*b + 3*pc.x*a*b*b + pd.x*b*b*b
-	y = pa.y*a*a*a + 3*pb.y*a*a*b + 3*pc.y*a*b*b + pd.y*b*b*b
-
-	return point.new(x, y)
-end
-
--- returns a 2D vector representing the tangent of the given curve at point t
--- (using a secant between points with small offsets from t)
-function findBezierTangent(poly, start, t, power)
-	local p1, p2
-	local EPSILON = .0001
-	p1 = evaluateCubicBezier(poly, start, t - EPSILON, power)
-	p2 = evaluateCubicBezier(poly, start, t + EPSILON, power)
-	return p2 - p1
-end
-
--- modulates the polyline using the specified equation. t is a value from 0 to
--- 1.0 representing the proportion of the length which has been interpolated.
--- Interpolation is performed so the center of each line segment is congruent
--- to some point on the generated arc
-function modulatePolyline(poly, equation, subdivisions, iterations, power)
+function modulatePolyline(poly, equation, iterations)
 	if not poly then
 		return
 	end
@@ -219,9 +158,7 @@ function main()
 
 	local scriptName = arg[0]
 	local equation = table.remove(arg, 1)
-	local subdivisions = table.remove(arg, 1)
 	local iterations = table.remove(arg, 1)
-	local power = table.remove(arg, 1) / 100
 
 	-- copy the specified convenience variables into the evaluation context
 	for index, var in ipairs(CONVENIENCE_VARIABLES) do
@@ -233,7 +170,7 @@ function main()
 	local objects = plugin:getSelectedObjects()
 
 	for k, v in pairs(objects) do
-		newGeom = modulatePolyline(v:getGeom(), equation, subdivisions, iterations, power)
+		newGeom = modulatePolyline(v:getGeom(), equation, iterations)
 		v:setGeom(newGeom)
 	end
 end   
