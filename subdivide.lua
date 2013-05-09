@@ -8,6 +8,7 @@ function getArgsMenu()
 
 	menu = 	{
 		CounterMenuItem.new("Size Threshold: ",  32, 1,       1,    0xFFFF, "", "", "max distance between points"),
+		CounterMenuItem.new("Smoothing: ",  100, 1,       1,    100, "%", "No Smoothing", "Amount of smoothing to perform"),
 		YesNoMenuItem.new("Subdivide Completely? ",  2, "Divide until all segments are below size threshold"),
 	}
 
@@ -66,13 +67,14 @@ end
 -- Returns a polyline which is a subdivision of the edges of the given poly
 -- using the following algorithm:
 -- 	- For each segment of the poly line:
---		- Output a vertex equal to the average of the first vertex of this
---		- segment with the two adjacent midpoints
+--		- Output a vertex equal to the weighted average of the first
+--		  vertex of this segment with the two adjacent midpoints
+--		  controlled by `smoothing`
 --		- If this segment's old length was greater than maxDistance:
 --			- Output a vertex at the old midpoint of the segment
 --	- If do_completely is true, and any subdivisions occured this pass:
 --		- Set the output geometry as input geometry and repeat
-function subdividePolyline(poly, maxDistance, do_completely)
+function subdividePolyline(poly, maxDistance, smoothing, do_completely)
 	if not poly then
 		return
 	end
@@ -89,11 +91,15 @@ function subdividePolyline(poly, maxDistance, do_completely)
 		newPoly = { }
 		done = true
 		for i = 1, #poly do
+			-- output the weighted average of the current point and
+			-- the two adjacent midpoints
 			local points = getPoints(poly, i - 1, 3)
-			if not (inputClosed and i == 1) then
-				local smoothedPoint = average({midPoint(points[1],points[2]),points[2],midPoint(points[2],points[3])})
+			if not (inputClosed and i == 0) then
+				local smoothedPoint = average({midPoint(points[1],points[2]),points[2],midPoint(points[2],points[3])}) * smoothing + points[2] * (1 - smoothing)
 				table.insert(newPoly, smoothedPoint)
 			end
+
+			-- split this segment if needed
 			if point.distanceTo(points[2], points[3]) > maxDistance then
 				logprint("subdividing points", points[2], points[3])
 				logprint("Distance = " .. point.distanceTo(points[2], points[3]))
@@ -121,6 +127,7 @@ function main()
 
 	local scriptName = arg[0]
 	local maxDistance = table.remove(arg, 1) + 0
+	local smoothing = table.remove(arg, 1) / 100
 	local completely = table.remove(arg, 1)
 
 	local gridSize = plugin:getGridSize()
@@ -129,7 +136,7 @@ function main()
 
 	for k, v in pairs(objects) do
 		if type(v:getGeom()) == "table" then
-			newGeom = subdividePolyline(v:getGeom(), maxDistance, completely == "Yes")
+			newGeom = subdividePolyline(v:getGeom(), maxDistance, smoothing, completely == "Yes")
 			v:setGeom(newGeom)
 		end
 	end
