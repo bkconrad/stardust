@@ -8,7 +8,7 @@
 function getArgsMenu()
 
 	menu = 	{
-		ToggleMenuItem.new("Max Distance", {"WallItem", "PolyWall", "Zone", "LoadoutZone", "GoalZone", "SlipZone"}, 1, "Object type to convert to")
+		ToggleMenuItem.new("Max Distance", {"WallItem", "PolyWall", "Zone", "LoadoutZone", "GoalZone", "LineItem"}, 1, "Object type to convert to")
 	}
 
 	return "Covert Objects", menu
