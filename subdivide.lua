@@ -8,7 +8,7 @@ function getArgsMenu()
 
 	menu = 	{
 		CounterMenuItem.new("Size Threshold: ",  32, 1,       1,    0xFFFF, "", "", "max distance between points"),
-		CounterMenuItem.new("Smoothing: ",  100, 1,       1,    100, "%", "No Smoothing", "Amount of smoothing to perform"),
+		CounterMenuItem.new("Smoothing: ",  0, 1,       0,    100, "%", "No Smoothing", "Amount of smoothing to perform"),
 		YesNoMenuItem.new("Subdivide Completely? ",  2, "Divide until all segments are below size threshold"),
 	}
 
@@ -31,15 +31,15 @@ function getPoint(poly, i)
 
 	if i < 1 then
 		if closed then
-			result = poly[#poly + i]
+			result = poly[#poly + i - 1]
 		else
-			result = poly[1] - (poly[2] - poly[1])
+			result = poly[1]
 		end
 	elseif i > #poly then
 		if closed then
 			result = poly[i - #poly + 1]
 		else
-			result = poly[#poly] - (poly[#poly] - poly[#poly-1])
+			result = poly[#poly]
 		end
 	else
 		result = poly[i]
@@ -100,7 +100,7 @@ function subdividePolyline(poly, maxDistance, smoothing, do_completely)
 			end
 
 			-- split this segment if needed
-			if point.distanceTo(points[2], points[3]) > maxDistance then
+			if (i ~= #poly) and point.distanceTo(points[2], points[3]) > maxDistance then
 				logprint("subdividing points", points[2], points[3])
 				logprint("Distance = " .. point.distanceTo(points[2], points[3]))
 				table.insert(newPoly, midPoint(points[2], points[3]))
@@ -110,11 +110,6 @@ function subdividePolyline(poly, maxDistance, smoothing, do_completely)
 			end
 		end
 		poly = newPoly
-	end
-
-	-- if the input poly was closed, then close the new poly
-	if inputClosed then
-		table.insert(newPoly, newPoly[1])
 	end
 
 	return newPoly
