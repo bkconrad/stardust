@@ -10,7 +10,7 @@ end
 function getArgsMenu()
 
 	menu = 	{
-		CounterMenuItem.new("Epsilon: ",  100, 1,       1,    100, "grid units", "", "Amount of smoothing to perform"),
+		TextEntryMenuItem.new("Epsilon: ", "2.0", "2.0", "Maximum variation to allow"),
 	}
 
 	return "Simplify", menu
@@ -142,7 +142,17 @@ function main()
 
 	for k, v in pairs(objects) do
 		if type(v:getGeom()) == "table" then
-			newGeom = rdp_simplify(v:getGeom(), epsilon)
+			local geom = v:getGeom()
+			local closed = false
+			if geom[1] == geom[#geom] then
+				table.remove(geom, #geom)
+				closed = true
+			end
+			newGeom = rdp_simplify(geom, epsilon)
+			if closed then
+				newGeom[#newGeom] = newGeom[1]
+			end
+
 			logprint('geom')
 			dump(newGeom)
 			v:setGeom(newGeom)
