@@ -5,6 +5,13 @@
 -- This work is released into the public domain
 -- Authored by kaen
 
+IMPLICITLY_CLOSED_CLASS_IDS = {
+	[ObjType.GoalZone] = true,
+	[ObjType.LoadoutZone] = true,
+	[ObjType.PolyWall] = true,
+	[ObjType.Zone] = true
+}
+
 function getArgsMenu()
 
 	menu = 	{
@@ -28,6 +35,18 @@ function main()
 		if type(geom) == "table" then
 			local constructor = loadstring("return " .. objectType .. ".new")()
 			local newObj = constructor()
+
+			-- add or remove closing point as needed
+			if IMPLICITLY_CLOSED_CLASS_IDS[obj:getClassId()] then
+				if not IMPLICITLY_CLOSED_CLASS_IDS[newObj:getClassId()] then
+					table.insert(geom, geom[#geom])
+				end
+			else
+				if IMPLICITLY_CLOSED_CLASS_IDS[newObj:getClassId()] then
+					table.remove(geom, #geom)
+				end
+			end
+
 			newObj:setGeom(geom)
 			plugin:addItem(newObj)
 		end
