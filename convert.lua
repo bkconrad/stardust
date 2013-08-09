@@ -31,6 +31,7 @@ function main()
 	local objects = plugin:getSelectedObjects()
 
 	for _, obj in pairs(objects) do
+		obj:setSelected(false)
 		local geom = obj:getGeom()
 		if type(geom) == "table" then
 			local constructor = loadstring("return " .. objectType .. ".new")()
@@ -39,15 +40,16 @@ function main()
 			-- add or remove closing point as needed
 			if IMPLICITLY_CLOSED_CLASS_IDS[obj:getClassId()] then
 				if not IMPLICITLY_CLOSED_CLASS_IDS[newObj:getClassId()] then
-					table.insert(geom, geom[#geom])
+					table.insert(geom, geom[1])
 				end
-			else
+			elseif geom[1] == geom[#geom] then
 				if IMPLICITLY_CLOSED_CLASS_IDS[newObj:getClassId()] then
 					table.remove(geom, #geom)
 				end
 			end
 
 			newObj:setGeom(geom)
+			newObj:setSelected(true)
 			plugin:addItem(newObj)
 		end
 	end

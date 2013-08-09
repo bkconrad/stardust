@@ -9,7 +9,7 @@ function getArgsMenu()
 	menu = 	{
 		CounterMenuItem.new("Size Threshold: ",  32, 1,       1,    0xFFFF, "", "", "max distance between points"),
 		CounterMenuItem.new("Smoothing: ",  0, 1,       0,    100, "%", "No Smoothing", "Amount of smoothing to perform"),
-		YesNoMenuItem.new("Subdivide Completely? ",  2, "Divide until all segments are below size threshold"),
+		YesNoMenuItem.new("Subdivide Completely: ",  2, "Divide until all segments are below size threshold")
 	}
 
 	return "Subdivide", menu
