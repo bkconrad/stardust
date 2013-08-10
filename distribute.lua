@@ -99,8 +99,6 @@ function align(obj, pos, edge)
     geom = Geom.translate(geom, offset, 0)
   elseif axis == "y" then
     geom = Geom.translate(geom, 0, offset)
-  else
-    logprint("Unkown axis: " .. axis)
   end
 
   obj:setGeom(geom)
