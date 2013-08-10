@@ -2,7 +2,15 @@
 -- Subdivide (a.k.a round) polygons using multi-pass fixed midpoint vertex
 -- insertion and gaussian first-order vertex smoothing
 -- This work is released into the public domain
+--
 -- Authored by kaen
+
+IMPLICITLY_CLOSED_CLASS_IDS = {
+	[ObjType.GoalZone] = true,
+	[ObjType.LoadoutZone] = true,
+	[ObjType.PolyWall] = true,
+	[ObjType.Zone] = true
+}
 
 function getArgsMenu()
 
@@ -114,23 +122,34 @@ function subdividePolyline(poly, maxDistance, smoothing, do_completely)
 end
 
 function main()
-	-- arg table will include values from menu items above, in order
-
-	local gridsize = plugin:getGridSize()
-
-	local scriptName = arg[0]
 	local maxDistance = table.remove(arg, 1) + 0
-	local smoothing = table.remove(arg, 1) / 100
-	local completely = table.remove(arg, 1)
-
-	local gridSize = plugin:getGridSize()
-
-	local objects = plugin:getSelectedObjects()
+	local smoothing   = table.remove(arg, 1) / 100
+	local completely  = table.remove(arg, 1)
+	local gridSize    = plugin:getGridSize()
+	local objects     = plugin:getSelectedObjects()
 
 	for k, v in pairs(objects) do
-		if type(v:getGeom()) == "table" then
-			newGeom = subdividePolyline(v:getGeom(), maxDistance, smoothing, completely == "Yes")
-			v:setGeom(newGeom)
+
+		local geom = v:getGeom()
+
+		if type(geom) == "table" then
+
+			local implicitlyClosed = IMPLICITLY_CLOSED_CLASS_IDS[v:getClassId()]
+
+			-- Add a virtual vertex to the end of implicitly closed types
+			if implicitlyClosed then
+				table.insert(geom, geom[1])
+			end
+
+			geom = subdividePolyline(geom, maxDistance, smoothing, completely == "Yes")
+
+			-- Remove duplicate vertexes from implicitly closed types
+			print('dist' .. point.distanceTo(geom[1], geom[#geom]))
+			if implicitlyClosed and point.distanceTo(geom[1], geom[#geom]) < 1 then
+				table.remove(geom, #geom)
+			end
+
+			v:setGeom(geom)
 		end
 	end
 end   
