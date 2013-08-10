@@ -2,9 +2,36 @@
 -- This work is released into the public domain
 -- Authored by kaen
 
+-- A map of edge names to functions which retrieve that edge from the objects
+-- extents
+EDGE_MAP = {
+  Left   = function(obj) return   extents(obj).minx end,
+  Center = function(obj) return ( extents(obj).minx + extents(obj).maxx) / 2 end,
+  Right  = function(obj) return   extents(obj).maxx end,
+  Bottom = function(obj) return   extents(obj).miny end,
+  Middle = function(obj) return ( extents(obj).miny + extents(obj).maxy) / 2 end,
+  Top    = function(obj) return   extents(obj).maxy end
+}
+
+EDGES = {
+}
+
+for k, v in pairs(EDGE_MAP) do
+  table.insert(EDGES, k)
+end
+
+AXIS_MAP = {
+  Left   = "x",
+  Center = "x",
+  Right  = "x",
+  Bottom = "y",
+  Middle = "y",
+  Top    = "y"
+}
+
 function getArgsMenu()
 	menu = 	{
-		ToggleMenuItem.new("Distribution Axis", {"x", "y"}, 1, "Axis to distribute over")
+		ToggleMenuItem.new("Distribute By", {"Left", "Center", "Right", "Bottom", "Middle", "Top"}, 1, "The relative position of the objects to distribute by")
 	}
 	return "Distribute", menu
 end
@@ -25,14 +52,12 @@ function extents(object)
 			maxy = math.max(maxy, p.y)
 		end
 	elseif type(points) == "point" then
-		local r
+    local r = 0
 
-		-- check if the object has getRad
-		if object.getRad then
-			r = object:getRad()
-		else
-			r = 0
-		end
+    -- Try to get the radius, but don't worry if you can't
+    pcall(function()
+      r = object:getRad()
+    end)
 
 		minx = points.x - r
 		maxx = points.x + r
@@ -43,21 +68,20 @@ function extents(object)
 	return { minx = minx, miny = miny, maxx = maxx, maxy = maxy }
 end
 
-function mergeExtents(objects)
-	local minx = math.huge
-	local miny = math.huge
-	local maxx = -math.huge
-	local maxy = -math.huge
+-- returns the minimum and maximum position of the given edge for all objects
+function edgeExtents(objects, edge)
+	local min = math.huge
+	local max = -math.huge
 
 	for k, obj in ipairs(objects) do
-		local ext = extents(obj)
-		minx = math.min(minx, ext.minx)
-		miny = math.min(miny, ext.miny)
-		maxx = math.max(maxx, ext.maxx)
-		maxy = math.max(maxy, ext.maxy)
+
+    -- Call the appropriate function on obj to get the edge position
+		local pos = EDGE_MAP[edge](obj)
+		min = math.min(min, pos)
+		max = math.max(max, pos)
 	end
 
-	return { minx = minx, miny = miny, maxx = maxx, maxy = maxy }
+	return { min = min, max = max }
 end
 
 -- get the object's midpoint
@@ -66,23 +90,27 @@ function midpoint(obj)
 	return point.new(ext.minx + (ext.maxx - ext.minx) / 2, ext.miny + (ext.maxy - ext.miny) / 2)
 end
 
--- set the object's midpoint
-function center(object, pos)
-	local geom = object:getGeom()
-	if type(geom) == "table" then
-		local half = halfSize(object)
-		local translation = pos - midpoint(object)
+function align(obj, pos, edge)
+  local offset = pos - EDGE_MAP[edge](obj)
+  local axis = AXIS_MAP[edge]
+  local geom = obj:getGeom()
 
-		local newGeom = { }
-		for i, p in ipairs(geom) do
-			table.insert(newGeom, p + translation)
-		end
-		object:setGeom(newGeom)
-	else
-		object:setLoc(pos)
-	end
+  if axis == "x" then
+    geom = Geom.translate(geom, offset, 0)
+  elseif axis == "y" then
+    geom = Geom.translate(geom, 0, offset)
+  else
+    logprint("Unkown axis: " .. axis)
+  end
+
+  obj:setGeom(geom)
 end
 
+-- get a point representing the object's x and y size
+function size(obj)
+  local ext = extents(obj)
+  return point.new(ext.maxx - ext.minx, ext.maxy - ext.miny)
+end
 
 function halfSize(object)
 	local geom = object:getGeom()
@@ -125,11 +153,10 @@ function sortTableListByProperty(list, property)
 	return result
 end
 
--- distribute objects across the specified axis (either "x" or "y")
-function distribute(objects, axis)
-	local ext = mergeExtents(objects)
-	local hstep = (ext.maxx - ext.minx) / #objects
-	local vstep = (ext.maxy - ext.miny) / #objects
+-- distribute objects using the specified edge
+function distribute(objects, edge)
+	local ext = edgeExtents(objects, edge)
+  local step = (ext.max - ext.min) / (#objects - 1)
 
 	local midpointsTable = { }
 	for _, obj in ipairs(objects) do
@@ -137,15 +164,14 @@ function distribute(objects, axis)
 		table.insert(midpointsTable, { x = mid.x, y = mid.y, obj = obj })
 	end
 
+  local axis = AXIS_MAP[edge]
+
 	local sortedTable = sortTableListByProperty(midpointsTable, axis)
 
-	for i, obj in pairs(sortedTable) do
-		local mid = midpoint(obj.obj)
-		if axis == "x" then
-			center(obj.obj, point.new(ext.minx + (i - 1) * hstep, mid.y))
-		else
-			center(obj.obj, point.new(mid.x, ext.miny + (i - 1) * vstep))
-		end
+	for i = 2, #sortedTable - 1 do
+    local obj = sortedTable[i].obj
+    local pos = ext.min + (i - 1) * step
+    align(obj, pos, edge)
 	end
 end
 
