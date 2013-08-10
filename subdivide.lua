@@ -101,8 +101,6 @@ function subdividePolyline(poly, maxDistance, smoothing, do_completely)
 
 			-- split this segment if needed
 			if (i ~= #poly) and point.distanceTo(points[2], points[3]) > maxDistance then
-				logprint("subdividing points", points[2], points[3])
-				logprint("Distance = " .. point.distanceTo(points[2], points[3]))
 				table.insert(newPoly, midPoint(points[2], points[3]))
 				if do_completely then
 					done = false

@@ -74,12 +74,10 @@ function getPoint(poly, i)
 	else
 		result = poly[i]
 	end
-	logprint(result)
 	return result
 end
 
 function getPoints(poly, start, n)
-	logprint("getting " .. n .. " points starting at " .. start)
 	local points = { }
 	for i = start, start+n do
 		table.insert(points, getPoint(poly, i))
