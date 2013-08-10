@@ -86,20 +86,10 @@ function table_slice (values,i1,i2)
 	return res
 end
 
-function dump(t)
-	for k, v in pairs(t) do
-		logprint(v)
-	end
-end
-
 -- return the indices of the polygon representing the RDP simplification of
 -- `poly` using `epsilon`
 function rdp_simplify(poly, epsilon)
-	logprint('called with: ')
-	dump(poly)
 	if #poly == 2 then
-		logprint('base case: ')
-		dump(poly)
 		return poly
 	end
 
@@ -114,13 +104,9 @@ function rdp_simplify(poly, epsilon)
 	end
 
 	if worstDistance < epsilon then
-		logprint('below epsilon')
-		dump({poly[1], poly[#poly]})
 		return {poly[1], poly[#poly]}
 	end
 
-	-- recurse
-	logprint('recursing')
 	local first, second
 	first = rdp_simplify(table_slice(poly, 1, worstIndex), epsilon)
 	second = rdp_simplify(table_slice(poly, worstIndex, #poly), epsilon)
@@ -131,7 +117,6 @@ function rdp_simplify(poly, epsilon)
 	for i = 2, #second do
 		table.insert(result, second[i])
 	end
-	dump(result)
 	return result
 end
 
@@ -152,9 +137,6 @@ function main()
 			if closed then
 				newGeom[#newGeom] = newGeom[1]
 			end
-
-			logprint('geom')
-			dump(newGeom)
 			v:setGeom(newGeom)
 		end
 	end
