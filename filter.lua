@@ -51,6 +51,7 @@ end
 
 function getArgsMenu()
 
+  -- Limit options to types of items currently selected
   local selectedTypes = {}
 
   for _, obj in pairs(plugin:getSelectedObjects()) do
@@ -61,8 +62,15 @@ function getArgsMenu()
     end
   end
 
+  local options = uniqueValues(selectedTypes)
+  table.sort(options)
+
+  if #options == 0 then
+    table.insert(options, '<No known objects selected>')
+  end
+
 	menu = 	{
-		ToggleMenuItem.new("Filter by Type:", uniqueValues(selectedTypes), 1, "The desired object type")
+		ToggleMenuItem.new("Filter by Type:", options, 1, "The desired object type")
 	}
 
 	return "Filter Selection", menu
