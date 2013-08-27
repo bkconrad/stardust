@@ -5,12 +5,7 @@
 -- This work is released into the public domain
 -- Authored by kaen
 
-IMPLICITLY_CLOSED_CLASS_IDS = {
-	[ObjType.GoalZone] = true,
-	[ObjType.LoadoutZone] = true,
-	[ObjType.PolyWall] = true,
-	[ObjType.Zone] = true
-}
+require('stardust')
 
 TARGET_TYPES = {
   "WallItem",
@@ -45,10 +40,6 @@ function getArgsMenu()
 	return "Convert Objects", menu
 end
 
--- map of object types to default arguments
-OBJECT_MAP = {
-}
-
 function main()
   local objectType = table.remove(arg, 1)
   local deleteOld  = table.remove(arg, 1)
@@ -63,12 +54,12 @@ function main()
 
     if type(geom) == "table" then
       -- add or remove closing point as needed
-      if IMPLICITLY_CLOSED_CLASS_IDS[obj:getClassId()] then
-        if not IMPLICITLY_CLOSED_CLASS_IDS[newObj:getClassId()] then
+      if sd.implicitlyClosed(obj) then
+        if not sd.implicitlyClosed(newObj) then
           table.insert(geom, geom[1])
         end
       elseif geom[1] == geom[#geom] then
-        if IMPLICITLY_CLOSED_CLASS_IDS[newObj:getClassId()] then
+        if sd.implicitlyClosed(newObj) then
           table.remove(geom, #geom)
         end
       end

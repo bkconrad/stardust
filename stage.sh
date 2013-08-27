@@ -1,12 +1,17 @@
 #!/bin/bash
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-DESTDIR=$HOME/code/bitfighter/resource/editor_plugins
+DESTDIR=$HOME/code/bitfighter/resource/
 
-cd $SCRIPTDIR
+function stage() {
+	cd $SCRIPTDIR/$1
+	for file in $(find . -name '*.lua')
+	do
+		base=$(basename $file)
+		rm $DESTDIR/$1/$base 2>/dev/null
+		echo "Staging $SCRIPTDIR/$1/$base to $DESTDIR/$1/$base"
+		ln -s $SCRIPTDIR/$1/$base $DESTDIR/$1/$base
+	done
+}
 
-for file in $(find . -name '*.lua')
-do
-	base=$(basename $file)
-	rm $DESTDIR/$base 2>/dev/null
-	ln -s $SCRIPTDIR/$base $DESTDIR/$base
-done
+stage editor_plugins
+stage scripts
