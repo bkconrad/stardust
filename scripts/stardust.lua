@@ -1,3 +1,5 @@
+require('geometry')
+
 local IMPLICITLY_CLOSED_CLASS_IDS = {
 	[ObjType.GoalZone] = true,
 	[ObjType.LoadoutZone] = true,
@@ -155,7 +157,7 @@ local function align(objects, alignment)
 		elseif alignment == "Middle" then
 			centerOn(obj, point.new(c.x, ext.miny + (ext.maxy - ext.miny) / 2))
 		else
-			print('Unknown alignment ' .. alignment)
+			error('Unknown alignment ' .. alignment)
 		end
 	end
 end
@@ -250,12 +252,147 @@ local function segmentAt(poly, d)
     return segment, segmentStart, segmentEnd
 end
 
+local EDGE = {
+	LEFT = 0,
+	CENTER = 1,
+	RIGHT = 2,
+	BOTTOM = 3,
+	MIDDLE = 4,
+	TOP = 5
+}
+
+-- Find the position of obj's given edge
+local function edgePos(obj, edge)
+  local ext = extents(obj)
+
+  if     edge == EDGE.LEFT   then return ext.minx
+  elseif edge == EDGE.CENTER then return (ext.minx + ext.maxx) / 2
+  elseif edge == EDGE.RIGHT  then return ext.maxx
+  elseif edge == EDGE.BOTTOM then return ext.miny
+  elseif edge == EDGE.MIDDLE then return (ext.miny + ext.maxy) / 2
+  elseif edge == EDGE.TOP    then return ext.maxy
+  else
+  	print('Unknown edge ' .. edge)
+  end
+end
+
+-- Returns the axis ('x' or 'y') which this edge is measured with
+local function axisOf(edge)
+  if     edge == EDGE.LEFT   then
+  	return "x"
+  elseif edge == EDGE.CENTER then
+  	return "x"
+  elseif edge == EDGE.RIGHT  then
+  	return "x"
+  elseif edge == EDGE.BOTTOM then
+  	return "y"
+  elseif edge == EDGE.MIDDLE then
+  	return "y"
+  elseif edge == EDGE.TOP    then
+  	return "y"
+  else
+  	error('Unknown edge ' .. edge)
+  end
+end
+
+
+-- Sorts a structure such as:
+--   {
+--		{ foo = 3, bip = 0 }
+--		{ foo = 1, bar = 2 },
+--	 }
+-- ordered by the specified property (such as 'foo')
+local function sortTableListByProperty(list, property)
+	local result = { list[1] }
+	for item, t in ipairs(list) do
+		if item ~= 1 then
+			local inserted = false
+			for i, u in ipairs(result) do
+				if u[property] > t[property] then
+					table.insert(result, i, t)
+					inserted = true
+					break
+				end
+			end
+			if not inserted then
+				table.insert(result, t)
+			end
+		end
+	end
+	return result
+end
+
+-- returns the minimum and maximum position of the given edge for all objects
+local function edgeExtents(objects, edge)
+	local min = math.huge
+	local max = -math.huge
+
+	for k, obj in ipairs(objects) do
+		local pos = edgePos(obj, edge)
+		min = math.min(min, pos)
+		max = math.max(max, pos)
+	end
+
+	return { min = min, max = max }
+end
+
+-- Move `obj` so that the given `edge` lies at `pos`
+local function alignTo(obj, pos, edge)
+	local axis = axisOf(edge)
+	local offset = pos - edgePos(obj, edge)
+	local geom = obj:getGeom()
+
+	print('aligning to ' .. pos .. ' by ' .. offset .. ' along ' .. axis)
+
+	if axis == 'x' then
+		geom = Geom.translate(geom, offset, 0)
+	elseif axis == 'y' then
+		geom = Geom.translate(geom, 0, offset)
+	else
+		error('No axis for edge ' .. edge)
+	end
+
+	print(geom)
+
+	obj:setGeom(geom)
+end
+
+-- distribute objects using the specified edge
+local function distribute(objects, edge)
+	local ext = edgeExtents(objects, edge)
+	local step = (ext.max - ext.min) / (#objects - 1)
+
+	local midpointsTable = { }
+	for _, obj in ipairs(objects) do
+		local mid = center(obj)
+		table.insert(midpointsTable, { x = mid.x, y = mid.y, obj = obj })
+	end
+
+	local axis = axisOf(edge)
+	local sortedTable = sortTableListByProperty(midpointsTable, axis)
+
+	for i = 2, #sortedTable - 1 do
+		local obj = sortedTable[i].obj
+		local pos = ext.min + (i - 1) * step
+		alignTo(obj, pos, edge)
+	end
+end
+
+-- get a point representing the object's x and y size
+local function size(obj)
+  local ext = extents(obj)
+  return point.new(ext.maxx - ext.minx, ext.maxy - ext.miny)
+end
+
 local stardust = {
 	align = align,
+	alignTo = alignTo,
+	append = append,
 	append = append,
 	average = average,
 	center = center,
 	centerOn = centerOn,
+	distribute = distribute,
 	extents = extents,
 	evaluateCubicBezier = evaluateCubicBezier,
 	getPoint = getPoint,
@@ -266,6 +403,9 @@ local stardust = {
 	mergeExtents = mergeExtents,
 	midPoint = midPoint,
 	segmentAt = segmentAt,
+	size = size,
+	sortTableListByProperty = sortTableListByProperty,
+	EDGE = EDGE,
 }
 
 _G["sd"] = stardust
