@@ -502,6 +502,89 @@ local function rdp_simplify(poly, epsilon)
 	return result
 end
 
+local function simplify(poly)
+	if not poly then
+		return
+	end
+
+	-- true if the polygon's start and end are equal
+	local inputClosed = false
+	if poly[1] == poly[#poly] then
+		inputClosed = true
+	end
+
+	local newPoly = { }
+
+	if not inputClosed then
+		table.insert(newPoly, poly[1])
+	end
+
+	for i = 1, #poly - 1 do
+		local points = getPoints(poly, i, 2)
+		table.insert(newPoly, midPoint(points[1], points[2]))
+	end
+
+	if not inputClosed then
+		table.insert(newPoly, poly[#poly])
+	end
+
+	-- if the input poly was closed, then close the new poly
+	if inputClosed then
+		table.insert(newPoly, midPoint(poly[1], poly[2]))
+	end
+
+	return newPoly
+end
+
+-- Returns a polyline which is a subdivision of the edges of the given poly
+-- using the following algorithm:
+-- 	- For each segment of the poly line:
+--		- Output a vertex equal to the weighted average of the first
+--		  vertex of this segment with the two adjacent midpoints
+--		  controlled by `smoothing`
+--		- If this segment's old length was greater than maxDistance:
+--			- Output a vertex at the old midpoint of the segment
+--	- If do_completely is true, and any subdivisions occured this pass:
+--		- Set the output geometry as input geometry and repeat
+local function subdividePolyline(poly, maxDistance, smoothing, do_completely)
+	if not poly then
+		return
+	end
+
+	-- true if the polygon's start and end are equal
+	local inputClosed = false
+	if poly[1] == poly[#poly] then
+		inputClosed = true
+	end
+
+	local done = false
+	local newPoly
+	while not done do
+		newPoly = { }
+		done = true
+		for i = 1, #poly do
+			-- output the weighted average of the current point and
+			-- the two adjacent midpoints
+			local points = getPoints(poly, i - 1, 3)
+			if not (inputClosed and i == 0) then
+				local smoothedPoint = sd.average({sd.midPoint(points[1],points[2]),points[2],sd.midPoint(points[2],points[3])}) * smoothing + points[2] * (1 - smoothing)
+				table.insert(newPoly, smoothedPoint)
+			end
+
+			-- split this segment if needed
+			if (i ~= #poly) and point.distanceTo(points[2], points[3]) > maxDistance then
+				table.insert(newPoly, sd.midPoint(points[2], points[3]))
+				if do_completely then
+					done = false
+				end
+			end
+		end
+		poly = newPoly
+	end
+
+	return newPoly
+end
+
 local stardust = {
 	align = align,
 	alignTo = alignTo,
@@ -523,9 +606,11 @@ local stardust = {
 	midPoint = midPoint,
 	rdp_simplify = rdp_simplify,
 	segmentAt = segmentAt,
+	simplify = simplify,
 	size = size,
 	slice = slice,
 	sortTableListByProperty = sortTableListByProperty,
+	subdividePolyline = subdividePolyline,
 	uniqueValues = uniqueValues,
 	EDGE = EDGE,
 	VALID_TYPES = VALID_TYPES,
