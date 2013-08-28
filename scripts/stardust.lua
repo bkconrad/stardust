@@ -1,5 +1,33 @@
 require('geometry')
 
+local VALID_TYPES = {
+  "Asteroid",
+  "AsteroidSpawn",
+  "Core",
+  "EnergyItem",
+  "Flag",
+  "FlagSpawn",
+  "ForceFieldProjector",
+  "GoalZone",
+  "LineItem",
+  "LoadoutZone",
+  "Mine",
+  "Nexus",
+  "PolyWall",
+  "RepairItem",
+  "ResourceItem",
+  "SoccerBallItem",
+  "ShipSpawn",
+  "SpeedZone",
+  "SpyBug",
+  "Teleporter",
+  "TestItem",
+  "TextItem",
+  "Turret",
+  "WallItem",
+  "Zone",
+}
+
 local IMPLICITLY_CLOSED_CLASS_IDS = {
 	[ObjType.GoalZone] = true,
 	[ObjType.LoadoutZone] = true,
@@ -384,6 +412,22 @@ local function size(obj)
   return point.new(ext.maxx - ext.minx, ext.maxy - ext.miny)
 end
 
+-- return an ordered table of unique values in t
+function uniqueValues(t)
+  local values = { }
+  local result = { }
+
+  for k, v in pairs(t) do
+    values[v] = true
+  end
+
+  for k, _ in pairs(values) do
+    table.insert(result, k)
+  end
+
+  return result
+end
+
 local stardust = {
 	align = align,
 	alignTo = alignTo,
@@ -405,7 +449,9 @@ local stardust = {
 	segmentAt = segmentAt,
 	size = size,
 	sortTableListByProperty = sortTableListByProperty,
+	uniqueValues = uniqueValues,
 	EDGE = EDGE,
+	VALID_TYPES = VALID_TYPES,
 }
 
 _G["sd"] = stardust
