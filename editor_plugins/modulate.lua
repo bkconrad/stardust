@@ -45,47 +45,6 @@ function getArgsMenu()
 	return "Modulate Polygon", menu
 end
 
-function midPoint(p1, p2)
-	return point.new((p1.x + p2.x) / 2, (p1.y + p2.y) / 2)
-end
-
--- return point i from poly, handling bounds crossing appropriately depending
--- on whether the polygon is closed or not
-function getPoint(poly, i)
-	local result
-	local closed = false
-
-	if poly[1] == poly[#poly] then
-		closed = true
-	end
-
-	if i < 1 then
-		if closed then
-			result = poly[#poly + i]
-		else
-			result = poly[1] - (poly[2] - poly[1])
-		end
-	elseif i > #poly then
-		if closed then
-			result = poly[i - #poly]
-		else
-			result = poly[#poly] - (poly[#poly] - poly[#poly-1])
-		end
-	else
-		result = poly[i]
-	end
-	return result
-end
-
-function getPoints(poly, start, n)
-	local points = { }
-	for i = start, start+n do
-		table.insert(points, getPoint(poly, i))
-	end
-	return points
-end
-
-
 function modulatePolyline(poly, equation, iterations)
 	if not poly then
 		return
@@ -123,7 +82,7 @@ function modulatePolyline(poly, equation, iterations)
 		end
 		t = traversedLength / totalLength
 
-		local tangent = findSlope(poly, i)
+		local tangent = sd.findSlope(poly, i)
 		local inverseTangent = point.normalize(point.new(tangent.y, -tangent.x))
 
 		local newPoint = p
@@ -141,12 +100,6 @@ function modulatePolyline(poly, equation, iterations)
 	end
 
 	return newPoly
-end
-
--- returns the average slope for vertex i
-function findSlope(poly, i)
-	local points = getPoints(poly, i - 1, 3)
-	return ((points[2] - points[1]) + (points[3] - points[2])) / 2
 end
 
 function main()

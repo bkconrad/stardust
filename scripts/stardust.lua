@@ -413,7 +413,7 @@ local function size(obj)
 end
 
 -- return an ordered table of unique values in t
-function uniqueValues(t)
+local function uniqueValues(t)
   local values = { }
   local result = { }
 
@@ -428,6 +428,80 @@ function uniqueValues(t)
   return result
 end
 
+-- returns the average slope for vertex i
+local function findSlope(poly, i)
+	local points = getPoints(poly, i - 1, 3)
+	return ((points[2] - points[1]) + (points[3] - points[2])) / 2
+end
+
+local function slice(values,i1,i2)
+	local res = {}
+	local n = #values
+	-- default values for range
+	i1 = i1 or 1
+	i2 = i2 or n
+	if i2 < 0 then
+		i2 = n + i2 + 1
+	elseif i2 > n then
+		i2 = n
+	end
+	if i1 < 1 or i1 > n then
+		return {}
+	end
+	local k = 1
+	for i = i1,i2 do
+		res[k] = values[i]
+		k = k + 1
+	end
+	return res
+end
+
+-- returns the minimum distance from the line containing the first two elements
+-- of `line` to the point `p`
+local function minimumDistance(line, p)
+	local a, n
+	-- beginning of the line segment
+	a = line[1]
+	-- unit vector from 1 to 2
+	n = point.normalize(line[2] - line[1])
+
+	return point.length((a - p) - point.dot(a - p, n) * n)
+end
+
+-- return the indices of the polygon representing the RDP simplification of
+-- `poly` using `epsilon`
+local function rdp_simplify(poly, epsilon)
+	if #poly == 2 then
+		return poly
+	end
+
+	local worstDistance = 0
+	local worstIndex
+	for i = 2,#poly-1 do
+		local d = minimumDistance({poly[1], poly[#poly]}, poly[i])
+		if d > worstDistance then
+			worstDistance = d
+			worstIndex = i
+		end
+	end
+
+	if worstDistance < epsilon then
+		return {poly[1], poly[#poly]}
+	end
+
+	local first, second
+	first = rdp_simplify(slice(poly, 1, worstIndex), epsilon)
+	second = rdp_simplify(slice(poly, worstIndex, #poly), epsilon)
+	local result = { }
+	for i = 1, #first do
+		table.insert(result, first[i])
+	end
+	for i = 2, #second do
+		table.insert(result, second[i])
+	end
+	return result
+end
+
 local stardust = {
 	align = align,
 	alignTo = alignTo,
@@ -439,6 +513,7 @@ local stardust = {
 	distribute = distribute,
 	extents = extents,
 	evaluateCubicBezier = evaluateCubicBezier,
+	findSlope = findSlope,
 	getPoint = getPoint,
 	getPoints = getPoints,
 	halfSize = halfSize,
@@ -446,8 +521,10 @@ local stardust = {
 	lengthOf = lengthOf,
 	mergeExtents = mergeExtents,
 	midPoint = midPoint,
+	rdp_simplify = rdp_simplify,
 	segmentAt = segmentAt,
 	size = size,
+	slice = slice,
 	sortTableListByProperty = sortTableListByProperty,
 	uniqueValues = uniqueValues,
 	EDGE = EDGE,
