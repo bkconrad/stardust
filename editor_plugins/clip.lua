@@ -6,19 +6,31 @@
 
 require("stardust")
 
-function getArgsMenu()
-
-	menu = 	{
-		ToggleMenuItem.new("Operation: ",{ "Union", "Intersection", "Xor", "Difference" }, 4, true, "Clipping operation to perform"),
-		ToggleMenuItem.new("First Object Is: ",{ "Subject", "Clip" }, 1, true, "Use first selected object as subject or clip"),
-		YesNoMenuItem.new("Merge Triangles: ",1, "Merge triangles into convex polygons when holes are created")
-	}
-
-	return "Clip Polygons", "Perform polygon boolean operations", "Ctrl+Shift+3", menu
-end
-
 function hasPolyGeom(object)
 	return type(object.getGeom) == "function" and type(object:getGeom()) == "table"
+end
+
+function getArgsMenu()
+
+	local menu = nil
+	local objects = plugin:getSelectedObjects()
+	sd.filter(objects, hasPolyGeom)
+
+	-- Return nil for menu arguments if the selection is invalid, causing main
+	-- to execute immediately when activated and fail with a useful error
+	-- message. Saves the user from filling out the dialog when his input is
+	-- already provably invalid.
+	if #objects > 1 then
+
+		menu = 	{
+			ToggleMenuItem.new("Operation: ",{ "Union", "Intersection", "Xor", "Difference" }, 4, true, "Clipping operation to perform"),
+			ToggleMenuItem.new("First Object Is: ",{ "Subject", "Clip" }, 1, true, "Use first selected object as subject or clip"),
+			YesNoMenuItem.new("Merge Triangles: ",1, "Merge triangles into convex polygons when holes are created")
+		}
+
+	end
+
+	return "Clip Polygons", "Perform polygon boolean operations", "Ctrl+Shift+3", menu
 end
 
 function main()
@@ -29,13 +41,14 @@ function main()
 	local subjects       = { }
 	local clips          = { }
 	local firstGeom      = nil
+	local firstObject    = nil
 
 	-- Find first valid polygonal object
 	while (firstGeom == nil) and (#objects > 0) do
 		local object = table.remove(objects, 1)
 		if hasPolyGeom(object) then
+			firstObject = object
 			firstGeom = object:getGeom()
-			object:removeFromGame()
 
 			if firstIsSubject then
 				subjects[1] = firstGeom
@@ -53,6 +66,9 @@ function main()
 		plugin:showMessage("You must select at least two polygon objects", false)
 		return
 	end
+
+	-- Delete the first object now
+	firstObject:removeFromGame()
 
 	-- Process the other objects
 	for _, object in ipairs(objects) do
