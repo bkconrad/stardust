@@ -10,7 +10,7 @@ function getArgsMenu()
     CounterMenuItem.new("Percentage",  50, 1,       1,    100, "", "", "Percentage of objects to deselect"),
 	}
 
-	return "Reduce Selection", menu
+	return "Reduce Selection", "Randomly deselect a percentage of selected objects", "Ctrl+Shift+4", menu
 end
 
 function main()

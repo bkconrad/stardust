@@ -9,7 +9,7 @@ function getArgsMenu()
 		ToggleMenuItem.new("Align on", {"Left", "Center", "Right", "Top", "Middle", "Bottom"})
 	}
 
-	return "Align Objects", menu
+	return "Align Objects", "Align objects using specified reference point", "Ctrl+Shift+;", menu
 end
 
 function main()

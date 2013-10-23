@@ -17,7 +17,7 @@ function getArgsMenu()
     CounterMenuItem.new("Subdivisions", 32, 1, 1, 0xFFFF, "", ""                 , "Number of points in the generated objects"), 
     CounterMenuItem.new("Bezier Power", 20, 1, 1, 0xFF  , "", "No Bezier fitting", "Strength of Bezier curve fitting"), 
   }
-  return "Bezier Curve Fitter", menu
+  return "Bezier Curve Fitter", "Fit curve to polygons", "Ctrl+Shift+]", menu
 end
 
 function fitBezier(poly, subdivisions, power)

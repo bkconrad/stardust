@@ -14,7 +14,7 @@ function getArgsMenu()
 
   for _, obj in pairs(plugin:getSelectedObjects()) do
     for _, typeName in ipairs(sd.VALID_TYPES) do
-      if ObjType[typeName] == obj:getClassId() then
+      if ObjType[typeName] == obj:getObjType() then
         table.insert(selectedTypes, typeName)
       end
     end
@@ -40,7 +40,7 @@ function main()
   local objects = plugin:getSelectedObjects()
 
   for _, obj in pairs(objects) do
-    if obj:getClassId() ~= ObjType[objectType] then
+    if obj:getObjType() ~= ObjType[objectType] then
       obj:setSelected(false)
     end
   end

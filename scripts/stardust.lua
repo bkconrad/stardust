@@ -281,7 +281,7 @@ end
 -- returns true if the object has polygon geometry i.e. it is
 -- always rendered as a closed polygon (Zones and polywalls)
 local function implicitlyClosed(obj)
-	return not not IMPLICITLY_CLOSED_CLASS_IDS[obj:getClassId()]
+	return not not IMPLICITLY_CLOSED_CLASS_IDS[obj:getObjType()]
 end
 
 -- returns `true` if arg is an object which is a zone, or an ObjType
@@ -317,7 +317,7 @@ local function centerOn(object, pos)
 		end
 		object:setGeom(newGeom)
 	else
-		object:setLoc(pos)
+		object:setPos(pos)
 	end
 end
 

@@ -37,7 +37,7 @@ function getArgsMenu()
 		YesNoMenuItem.new("Delete Old Objects", 2, "Delete the original objects after the new ones are created")
 	}
 
-	return "Convert Objects", menu
+	return "Convert Objects", "Convert all selected objects to another type", "Ctrl+Shift+.", menu
 end
 
 function main()

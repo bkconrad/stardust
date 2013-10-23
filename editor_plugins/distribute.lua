@@ -16,7 +16,7 @@ function getArgsMenu()
 	menu = 	{
 		ToggleMenuItem.new("Distribute By", choices, 1, "The relative position of the objects to distribute by")
 	}
-	return "Distribute", menu
+	return "Distribute", "Evenly distribute objects", "Ctrl+Shift+'", menu
 end
 
 function main()
