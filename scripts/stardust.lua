@@ -25,15 +25,146 @@ local VALID_TYPES = {
   "TextItem",
   "Turret",
   "WallItem",
-  "Zone",
+  "Zone"
 }
 
 local IMPLICITLY_CLOSED_CLASS_IDS = {
 	[ObjType.GoalZone] = true,
 	[ObjType.LoadoutZone] = true,
 	[ObjType.PolyWall] = true,
+	[ObjType.SlipZone] = true,
 	[ObjType.Zone] = true
 }
+
+local ZONE_CLASS_IDS = {
+	[ObjType.GoalZone] = true,
+	[ObjType.LoadoutZone] = true,
+	[ObjType.SlipZone] = true,
+	[ObjType.Zone] = true
+}
+
+local OBJTYPE_TO_CLASS = {
+	-- [ObjType.Barrier]             = Barrier,
+	[ObjType.Ship]                = Ship,
+	[ObjType.Line]                = LineItem,
+	[ObjType.ResourceItem]        = ResourceItem,
+	[ObjType.TextItem]            = TextItem,
+	[ObjType.LoadoutZone]         = LoadoutZone,
+	[ObjType.TestItem]            = TestItem,
+	[ObjType.Flag]                = FlagItem,
+	-- [ObjType.Bullet]              = Bullet,
+	[ObjType.Burst]               = Burst,
+	[ObjType.Mine]                = Mine,
+	[ObjType.Nexus]               = NexusZone,
+	[ObjType.Robot]               = Robot,
+	[ObjType.Teleporter]          = Teleporter,
+	[ObjType.GoalZone]            = GoalZone,
+	[ObjType.Asteroid]            = Asteroid,
+	[ObjType.RepairItem]          = RepairItem,
+	[ObjType.EnergyItem]          = EnergyItem,
+	[ObjType.SoccerBallItem]      = SoccerBallItem,
+	[ObjType.Turret]              = Turret,
+	-- [ObjType.ForceField]          = ForceField,
+	[ObjType.ForceFieldProjector] = ForceFieldProjector,
+	[ObjType.SpeedZone]           = SpeedZone,
+	[ObjType.PolyWall]            = PolyWall,
+	[ObjType.ShipSpawn]           = Spawn,
+	[ObjType.FlagSpawn]           = FlagSpawn,
+	[ObjType.AsteroidSpawn]       = AsteroidSpawn,
+	[ObjType.WallItem]            = WallItem,
+	-- [ObjType.SlipZone]            = SlipZone,
+	[ObjType.SpyBug]              = SpyBug,
+	[ObjType.Core]                = CoreItem,
+	[ObjType.Zone]                = Zone,
+	[ObjType.Seeker]              = Seeker 
+}
+
+-- Return a shallow copy of t
+local function copy(t)
+	local u = { }
+	for k,v in pairs(t) do
+		u[k] = v
+	end
+	return u
+end
+
+-- Reverse the order of t's ipairs in place
+local function reverse(t)
+	for i=1,#t/2 do
+		local temp = t[i]
+		t[i] = t[#t - i + 1]
+		t[#t - i + 1] = temp
+	end
+
+	return t
+end
+
+-- Swap the keys and values of all pairs in t
+local function invert(t)
+	local u = copy(t)
+	for k,v in pairs(u) do
+		t[k] = nil
+		t[v] = k
+	end
+
+	return t
+end
+
+-- Apply f to each value in t
+local function each(t, f)
+	for k,v in pairs(t) do
+		f(v)
+	end
+end
+
+-- Change all values `v` in t to the result of f(v)
+local function map(t, f)
+	for k,v in pairs(t) do
+		t[k] = f(v)
+	end
+	return t
+end
+
+-- Save some work here
+local CLASS_TO_OBJTYPE = invert(copy(OBJTYPE_TO_CLASS))
+
+-- Returns true if all of the given objects are of one of the specified types
+local function is(...)
+	local objTypes = { }
+	local objects = { }
+
+	for _, v in pairs(arg) do
+		print(CLASS_TO_OBJTYPE[v])
+		if type(v) == "userdata" then
+			table.insert(objects, v)
+		elseif type(v) == "number" then
+			table.insert(objTypes, v)
+		elseif CLASS_TO_OBJTYPE[v] then
+			table.insert(objTypes, CLASS_TO_OBJTYPE[v])
+		end
+	end
+
+	if #objects == 0 then
+		return false
+	end
+
+	for j,object in ipairs(objects) do
+		local objectResult = false
+
+		for i,objtype in ipairs(objTypes) do
+			if objtype == object:getObjType() then
+				objectResult = true
+				break
+			end
+		end
+
+		if objectResult == false then
+			return false
+		end
+	end
+
+	return true
+end
 
 -- adds every element of t2 on to t1:
 -- 
@@ -62,6 +193,12 @@ local function filter(t, predicate)
 		j = j + 1
 	end
 
+	return t
+end
+
+-- Keep all objects in `t` which are of one of the Classes or ObjTypes given
+local function keep(t, ...)
+	filter(t, function(x) return is(x, unpack(arg)) end)
 	return t
 end
 
@@ -145,6 +282,20 @@ end
 -- always rendered as a closed polygon (Zones and polywalls)
 local function implicitlyClosed(obj)
 	return not not IMPLICITLY_CLOSED_CLASS_IDS[obj:getClassId()]
+end
+
+-- returns `true` if arg is an object which is a zone, or an ObjType
+-- corresponding to a zone type. `false` otherwise.
+local function isZone(arg)
+	local result = false
+
+	if type(arg) == "number" then
+		result = not not ZONE_CLASS_IDS[arg]
+	elseif type(arg) == "userdata" and type(arg.getObjType) == "function" then
+		result = not not ZONE_CLASS_IDS[arg:getObjType()]
+	end
+
+	return result
 end
 
 -- get the object's center point
@@ -605,15 +756,39 @@ local function subdividePolyline(poly, maxDistance, smoothing, do_completely)
 	return newPoly
 end
 
+--[[
+Returns a string of the form "1 thing" or "2 things"
+@param n The number of things
+@param singular The singular version of the word
+@param [plural] An explicit puralized version of the word
+@param [includeCount] Set to false to disable adding the count before the word
+]]
+local function plural(n, singular, plural, includeCount)
+	local result = ""
+	if includeCount == nil or includeCount then
+		result = n .. " "
+	end
+
+	if n == 1 then
+		result = result .. singular
+	elseif type(plural) == "string" then
+		result = result .. plural
+	else
+		result = result .. singular .. "s"
+	end
+	return result
+end
+
 local stardust = {
 	align                   = align,
 	alignTo                 = alignTo,
 	append                  = append,
-	append                  = append,
 	average                 = average,
 	center                  = center,
 	centerOn                = centerOn,
+	copy                    = copy,
 	distribute              = distribute,
+	each                    = each,
 	extents                 = extents,
 	evaluateCubicBezier     = evaluateCubicBezier,
 	findSlope               = findSlope,
@@ -622,9 +797,14 @@ local stardust = {
 	getPoints               = getPoints,
 	halfSize                = halfSize,
 	implicitlyClosed        = implicitlyClosed,
+	is                      = is,
+	isZone                  = isZone,
+	keep                    = keep,
 	lengthOf                = lengthOf,
+	map                     = map,
 	mergeExtents            = mergeExtents,
 	midPoint                = midPoint,
+	plural                  = plural,
 	rdp_simplify            = rdp_simplify,
 	segmentAt               = segmentAt,
 	simplify                = simplify,
