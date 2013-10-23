@@ -45,6 +45,26 @@ local function append(t1, t2)
 	end
 end
 
+-- removes all t[k] where predicate(t[k]) == false
+local function filter(t, predicate)
+	local j = 1
+
+	for i = 1,#t do
+		local v = t[i]
+		if predicate(v) then
+			t[j] = v
+			j = j + 1
+		end
+	end
+
+	while t[j] ~= nil do
+		t[j] = nil
+		j = j + 1
+	end
+
+	return t
+end
+
 -- return the extents of the given object
 local function extents(object)
 	local minx = math.huge
@@ -586,34 +606,35 @@ local function subdividePolyline(poly, maxDistance, smoothing, do_completely)
 end
 
 local stardust = {
-	align = align,
-	alignTo = alignTo,
-	append = append,
-	append = append,
-	average = average,
-	center = center,
-	centerOn = centerOn,
-	distribute = distribute,
-	extents = extents,
-	evaluateCubicBezier = evaluateCubicBezier,
-	findSlope = findSlope,
-	getPoint = getPoint,
-	getPoints = getPoints,
-	halfSize = halfSize,
-	implicitlyClosed = implicitlyClosed,
-	lengthOf = lengthOf,
-	mergeExtents = mergeExtents,
-	midPoint = midPoint,
-	rdp_simplify = rdp_simplify,
-	segmentAt = segmentAt,
-	simplify = simplify,
-	size = size,
-	slice = slice,
+	align                   = align,
+	alignTo                 = alignTo,
+	append                  = append,
+	append                  = append,
+	average                 = average,
+	center                  = center,
+	centerOn                = centerOn,
+	distribute              = distribute,
+	extents                 = extents,
+	evaluateCubicBezier     = evaluateCubicBezier,
+	findSlope               = findSlope,
+	filter                  = filter,
+	getPoint                = getPoint,
+	getPoints               = getPoints,
+	halfSize                = halfSize,
+	implicitlyClosed        = implicitlyClosed,
+	lengthOf                = lengthOf,
+	mergeExtents            = mergeExtents,
+	midPoint                = midPoint,
+	rdp_simplify            = rdp_simplify,
+	segmentAt               = segmentAt,
+	simplify                = simplify,
+	size                    = size,
+	slice                   = slice,
 	sortTableListByProperty = sortTableListByProperty,
-	subdividePolyline = subdividePolyline,
-	uniqueValues = uniqueValues,
-	EDGE = EDGE,
-	VALID_TYPES = VALID_TYPES,
+	subdividePolyline       = subdividePolyline,
+	uniqueValues            = uniqueValues,
+	EDGE                    = EDGE,
+	VALID_TYPES             = VALID_TYPES,
 }
 
 _G["sd"] = stardust
