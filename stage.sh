@@ -1,10 +1,17 @@
 #!/bin/bash
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-DESTDIR=$HOME/code/bitfighter/resource/
+
+# Optionally takes one argument, the destination resource directory
+if [ -z $1 ]
+then
+	DESTDIR=$HOME/code/bitfighter/resource/
+else
+	DESTDIR=$1
+fi
 
 function stage() {
-	cd $SCRIPTDIR/$1
-	for file in $(find . -name '*.lua')
+	mkdir -p $DESTDIR/$1
+	for file in $(find $SCRIPTDIR/$1 -name '*.lua')
 	do
 		base=$(basename $file)
 		rm $DESTDIR/$1/$base 2>/dev/null
