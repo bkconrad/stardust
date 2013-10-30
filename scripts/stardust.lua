@@ -845,6 +845,34 @@ local function plural(n, singular, plural, includeCount)
 	return result
 end
 
+--[[
+@func table polarClamp(points, center, radius)
+
+@brief
+Clamp `points` to within `radius` units of `center`.
+
+@desc
+Clamp `points` to within `radius` units of `center`, modifying `points` in
+place. Points further than `radius` units away from `center` will be moved
+directly towards `center` until they are exactly `radius` away.
+
+@param points The points to clamp.
+@param center The center of circle to clamp within.
+@param radius The distance from center to clamp all the points within.
+
+]]
+local function polarClamp(points, center, radius)
+	local rSquared = radius^2
+	for i,p in ipairs(points) do
+		local distSquared = point.distSquared(p, center)
+		if distSquared > rSquared then
+			points[i] = point.normalize(p - center) * radius
+		end
+	end
+
+	return points
+end
+
 -- copy the local environment into `sd`
 local i = 1
 while true do
