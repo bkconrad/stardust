@@ -1,5 +1,8 @@
 require('geometry')
 
+sd = { }
+_G["sd"] = sd
+
 local VALID_TYPES = {
   "Asteroid",
   "AsteroidSpawn",
@@ -842,43 +845,17 @@ local function plural(n, singular, plural, includeCount)
 	return result
 end
 
-local stardust = {
-	align                   = align,
-	alignTo                 = alignTo,
-	append                  = append,
-	average                 = average,
-	center                  = center,
-	centerOn                = centerOn,
-	copy                    = copy,
-	distribute              = distribute,
-	each                    = each,
-	extents                 = extents,
-	evaluateCubicBezier     = evaluateCubicBezier,
-	findSlope               = findSlope,
-	filter                  = filter,
-	getPoint                = getPoint,
-	getPoints               = getPoints,
-	halfSize                = halfSize,
-	implicitlyClosed        = implicitlyClosed,
-	is                      = is,
-	isZone                  = isZone,
-	keep                    = keep,
-	lengthOf                = lengthOf,
-	map                     = map,
-	mergeExtents            = mergeExtents,
-	midPoint                = midPoint,
-	plural                  = plural,
-	rdp_simplify            = rdp_simplify,
-	segmentAt               = segmentAt,
-	simplify                = simplify,
-	size                    = size,
-	slice                   = slice,
-	spread                  = spread,
-	sortTableListByProperty = sortTableListByProperty,
-	subdividePolyline       = subdividePolyline,
-	uniqueValues            = uniqueValues,
-	EDGE                    = EDGE,
-	VALID_TYPES             = VALID_TYPES,
-}
+-- copy the local environment into `sd`
+local i = 1
+while true do
+	local k, v = debug.getlocal(1, i)
+	if not k then
+		break
+	end
 
-_G["sd"] = stardust
+	sd[k] = v
+	i = i + 1
+end
+
+--[[
+]]
