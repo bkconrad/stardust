@@ -899,6 +899,28 @@ local function sortOn(t, k)
 	return t
 end
 
+--[[
+@func table makeCircle(center, r, div)
+
+@brief
+Make a circle at `center` with radius `r` using `div` number of divisions. More
+divisions mean a more round-looking circle.
+
+@param center The center of the circle.
+@param r The radius of the circle.
+@param [div] The number of subdivisions to use. Defaults to 32.
+
+@return Table of points suitable for use as a polygon geometry.
+]]
+local function makeCircle(center, r, div)
+	div = div or 32
+	local result = { }
+	for theta = 0, math.tau, math.tau/div do
+		table.insert(result, point.new(math.sin(theta) * r, math.cos(theta) * r))
+	end
+	return result
+end
+
 -- copy the local environment into `sd`
 local i = 1
 while true do
