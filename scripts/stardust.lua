@@ -28,6 +28,10 @@ local VALID_TYPES = {
   "Zone"
 }
 
+local function complain(str)
+	print(str)
+end
+
 local IMPLICITLY_CLOSED_CLASS_IDS = {
 	[ObjType.GoalZone] = true,
 	[ObjType.LoadoutZone] = true,
@@ -757,6 +761,65 @@ local function subdividePolyline(poly, maxDistance, smoothing, do_completely)
 end
 
 --[[
+@func table spread(points, power)
+@brief
+Spread a table of points away from each other.
+
+@desc
+Spreads the given points using either inverse exponential displacement (that is,
+`D = k / d^2` where D is the displacement vector applied to p1, k is `power`,
+and d is the distance between points p1 and p2) or a user-supplied function. The
+user-supplied function may be either a callable function or a string to be
+converted into a callable function using makeEquation.
+
+Each point is tested against each point other than itself. The two points are
+fed into the power function, (as arguments `p1` and `p2`) and the return value
+of the function is added to the point's displacement vector. The sumed
+displacement vectors received by each point are then added to the position of
+that point to find its new position.
+
+@param table A table of points, which is modified in place.
+@param power Either a number to use as k in `D = k / d^2`, a function which
+	takes two arguments and returns a displacement vector, or a string to be
+	converted via makeEquation with p1 and p2 set in its context.
+
+@return The result of the spreading, which is the same table supplied as
+    `points` with its values modified
+]]
+local function spread(points, power)
+	local fn
+	if type(power) == 'number' then
+		fn = function(p1, p2) return point.normalize(p1 - p2) * power / point.distSquared(p1, p2) end
+	elseif type(power) == 'string' then
+		fn = makeEquation(power)
+	elseif type(power) == 'function' then
+		fn = power
+	else
+		complain('Expected number, string, or function for "power"')
+		return
+	end
+
+	local forces = { }
+	for i=1,#points do
+		local force = point.zero
+		local p1 = points[i]
+		for j=1,#points do
+			if i ~= j then
+				local p2 = points[j]
+				force = force + fn(p1, p2)
+			end
+		end
+		forces[i] = force
+	end
+
+	for i=1,#points do
+		points[i] = points[i] + forces[i]
+	end
+
+	return points
+end
+
+--[[
 Returns a string of the form "1 thing" or "2 things"
 @param n The number of things
 @param singular The singular version of the word
@@ -810,6 +873,7 @@ local stardust = {
 	simplify                = simplify,
 	size                    = size,
 	slice                   = slice,
+	spread                  = spread,
 	sortTableListByProperty = sortTableListByProperty,
 	subdividePolyline       = subdividePolyline,
 	uniqueValues            = uniqueValues,
