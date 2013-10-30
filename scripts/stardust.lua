@@ -873,6 +873,32 @@ local function polarClamp(points, center, radius)
 	return points
 end
 
+--[[
+@func table sortOn(t, k)
+@brief
+Sort an array of tables by a shared property `k`.
+
+@desc
+Sorts a structure such as:
+@code
+  {
+	{ foo = 321, bam = 432 },
+	{ foo = 123, bar = 234 }
+  }
+@endcode
+
+By a specified property such as `foo`.
+
+@param t The array of tables to sort.
+@param k The value to use in the expression t[k] when sorting.
+
+@return The sorted array of tables.
+]]
+local function sortOn(t, k)
+	table.sort(t, function(a, b) return a[k] < b[k] end)
+	return t
+end
+
 -- copy the local environment into `sd`
 local i = 1
 while true do
