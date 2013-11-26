@@ -1,7 +1,6 @@
 require('geometry')
 
 sd = { }
-_G["sd"] = sd
 
 local VALID_TYPES = {
   "Asteroid",
@@ -921,17 +920,58 @@ local function makeCircle(center, r, div)
 	return result
 end
 
--- copy the local environment into `sd`
-local i = 1
-while true do
-	local k, v = debug.getlocal(1, i)
-	if not k then
-		break
-	end
+sd = {
+	align                       = align,
+	alignTo                     = alignTo,
+	append                      = append,
+	average                     = average,
+	axisOf                      = axisOf,
+	center                      = center,
+	centerOn                    = centerOn,
+	complain                    = complain,
+	copy                        = copy,
+	distribute                  = distribute,
+	each                        = each,
+	edgeExtents                 = edgeExtents,
+	edgePos                     = edgePos,
+	evaluateCubicBezier         = evaluateCubicBezier,
+	extents                     = extents,
+	filter                      = filter,
+	findSlope                   = findSlope,
+	getPoint                    = getPoint,
+	getPoints                   = getPoints,
+	halfSize                    = halfSize,
+	implicitlyClosed            = implicitlyClosed,
+	invert                      = invert,
+	is                          = is,
+	isZone                      = isZone,
+	keep                        = keep,
+	lengthOf                    = lengthOf,
+	makeCircle                  = makeCircle,
+	map                         = map,
+	mergeExtents                = mergeExtents,
+	midPoint                    = midPoint,
+	minimumDistance             = minimumDistance,
+	plural                      = plural,
+	polarClamp                  = polarClamp,
+	rdp_simplify                = rdp_simplify,
+	reverse                     = reverse,
+	segmentAt                   = segmentAt,
+	simplify                    = simplify,
+	size                        = size,
+	slice                       = slice,
+	sortOn                      = sortOn,
+	sortTableListByProperty     = sortTableListByProperty,
+	spread                      = spread,
+	subdividePolyline           = subdividePolyline,
+	uniqueValues                = uniqueValues,
+	
+	CLASS_TO_OBJTYPE            = CLASS_TO_OBJTYPE,
+	EDGE                        = EDGE,
+	IMPLICITLY_CLOSED_CLASS_IDS = IMPLICITLY_CLOSED_CLASS_IDS,
+	OBJTYPE_TO_CLASS            = OBJTYPE_TO_CLASS,
+	VALID_TYPES                 = VALID_TYPES,
+	ZONE_CLASS_IDS              = ZONE_CLASS_IDS,
+}
 
-	sd[k] = v
-	i = i + 1
-end
-
---[[
-]]
+return sd

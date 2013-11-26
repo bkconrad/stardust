@@ -4,7 +4,7 @@
 --
 -- Authored by kaen
 
-require("stardust")
+local sd = require('stardust')
 
 function hasPolyGeom(object)
 	return type(object.getGeom) == "function" and type(object:getGeom()) == "table"

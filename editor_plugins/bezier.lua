@@ -2,7 +2,7 @@
 -- Adaptations are released into the public domain
 -- Authored by kaen
 
-require('stardust')
+local sd = require('stardust')
 
 IMPLICITLY_CLOSED_CLASS_IDS = {
 	[ObjType.GoalZone] = true,

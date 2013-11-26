@@ -5,7 +5,7 @@
 -- A map of edge names to functions which retrieve that edge from the objects
 -- extents
 
-require("stardust")
+local sd = require('stardust')
 
 function getArgsMenu()
 	local choices = { }

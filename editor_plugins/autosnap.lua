@@ -4,7 +4,7 @@
 --
 -- Authored by kaen
 
-require("stardust")
+local sd = require('stardust')
 
 function getArgsMenu()
 	return "AutoSnap", "Automatically snap zones to PolyWalls", "Ctrl+Shift+["
@@ -14,9 +14,6 @@ function main()
 
 	local walls = sd.keep(plugin:getSelectedObjects(), PolyWall)
 	local zones = sd.filter(plugin:getSelectedObjects(), sd.isZone)
-
-	print(#walls)
-	print(#zones)
 
 	-- Make sure we have valid inputs
 	if (#walls == 0) or (#zones == 0) then

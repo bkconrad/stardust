@@ -5,7 +5,7 @@
 --
 -- Authored by kaen
 
-require("stardust")
+local sd = require('stardust')
 
 function getArgsMenu()
 

@@ -5,7 +5,7 @@
 -- This work is released into the public domain
 -- Authored by kaen
 
-require('stardust')
+local sd = require('stardust')
 
 TARGET_TYPES = {
   "WallItem",
