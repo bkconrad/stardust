@@ -40,7 +40,7 @@ function main()
 
 			-- Remove duplicate vertexes from implicitly closed types
 			print('dist' .. point.distanceTo(geom[1], geom[#geom]))
-			if sd.implicitlyClosed(v) and point.distanceTo(geom[1], geom[#geom]) < 1 then
+			while sd.implicitlyClosed(v) and point.distanceTo(geom[1], geom[#geom]) < 1 do
 				table.remove(geom, #geom)
 			end
 
