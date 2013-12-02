@@ -3,7 +3,7 @@
 -- Authored by kaen
 
 function getArgsMenu()
-	return "Invert Selection", { }
+	return "Invert Selection", "Invert selection status of all objects", "Ctrl+I", { }
 end
 
 function main()

@@ -4,6 +4,10 @@
 -- Authored by kaen
 local sd = require('stardust')
 
+function getArgsMenu()
+	return "Simplify I", "Simplify polygons by removing a single vertex", "Ctrl+-"
+end
+
 function main()
 
 	local objects = plugin:getSelectedObjects()

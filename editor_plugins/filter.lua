@@ -23,21 +23,23 @@ function getArgsMenu()
   local options = sd.uniqueValues(selectedTypes)
   table.sort(options)
 
-  if #options == 0 then
-    table.insert(options, '<No known objects selected>')
+  local menu = { }
+  if #options > 0 then
+    menu[1] = ToggleMenuItem.new("Filter by Type:", options, 1, "The desired object type")
   end
 
-	menu = 	{
-		ToggleMenuItem.new("Filter by Type:", options, 1, "The desired object type")
-	}
-
-	return "Filter Selection", menu
+	return "Filter Selection", "Deselect objects other than the specified type", "Ctrl+Shift+F", menu
 end
 
 function main()
-  local objectType = table.remove(arg, 1)
 
   local objects = plugin:getSelectedObjects()
+  if #objects == 0 then
+    plugin:showMessage('No known objects selected', false)
+    return
+  end
+
+  local objectType = table.remove(arg, 1)
 
   for _, obj in pairs(objects) do
     if obj:getObjType() ~= ObjType[objectType] then

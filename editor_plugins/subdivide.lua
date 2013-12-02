@@ -15,7 +15,7 @@ function getArgsMenu()
 		YesNoMenuItem.new("Subdivide Completely: ",  2, "Divide until all segments are below size threshold")
 	}
 
-	return "Subdivide", menu
+	return "Subdivide", "Subdivide and smooth polygons", "Ctrl+]", menu
 end
 
 function main()

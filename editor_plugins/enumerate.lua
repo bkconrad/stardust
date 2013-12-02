@@ -7,7 +7,7 @@ function getArgsMenu()
 		CounterMenuItem.new("Starting Number",  0, 10, 0, 0xFFFF, "", "", "The number to start the IDs at"),
 		CounterMenuItem.new("Increment",  1, 1, -0xFFFF, 0xFFFF, "", "", "The number to start the IDs at"),
 	}
-	return "Enumerate", menu
+	return "Enumerate ID", "Mass-assign ID numbers to selected objects", menu
 end
 
 function main()

@@ -11,7 +11,7 @@ function getArgsMenu()
 		TextEntryMenuItem.new("Epsilon: ", "2.0", "2.0", "Maximum variation to allow"),
 	}
 
-	return "Simplify", menu
+	return "Simplify II", "Simplify by removing variations greater than a threshold", "Ctrl+=", menu
 end
 
 function main()

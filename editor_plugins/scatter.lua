@@ -8,7 +8,7 @@ function getArgsMenu()
 		CounterMenuItem.new("Max Distance", 128, 1, 0, 0xFFFF, "grid units", "", "Maximum distance to scatter")
 	}
 
-	return "Scatter Objects", menu
+	return "Scatter Objects", "Randomly scatter objects by some distance", "Ctrl+Shift+/", menu
 end
 
 function main()

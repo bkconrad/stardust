@@ -10,7 +10,7 @@ function getArgsMenu()
 	menu = 	{
 		CounterMenuItem.new("Offset",  0, 1, -0xFFFF, 0xFFFF, "", "", "The number to add to each ID"),
 	}
-	return "Offset ID", menu
+	return "Offset ID", "Add a value to the ID numbers of selected objects", menu
 end
 
 function main()
