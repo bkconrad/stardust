@@ -920,6 +920,19 @@ local function makeCircle(center, r, div)
 	return result
 end
 
+
+--[[
+@brief Return a copy of the given object including editor properties
+]]
+local function clone(obj)
+	local result = OBJTYPE_TO_CLASS[obj:getObjType()].new()
+	pcall(function() result:setGeom(obj:getGeom()) end)
+	pcall(function() result:setWidth(obj:getWidth()) end)
+	pcall(function() result:setTeam(obj:getTeamIndex()) end)
+	pcall(function() result:setText(obj:getText()) end)
+	return result
+end
+
 sd = {
 	align                       = align,
 	alignTo                     = alignTo,
@@ -928,6 +941,7 @@ sd = {
 	axisOf                      = axisOf,
 	center                      = center,
 	centerOn                    = centerOn,
+	clone                       = clone,
 	complain                    = complain,
 	copy                        = copy,
 	distribute                  = distribute,
