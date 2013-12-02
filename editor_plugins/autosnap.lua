@@ -21,31 +21,32 @@ function main()
 		return
 	end
 
-	-- Create our geometry tables and remove all zones from the game
+	-- Deselect all objects
+	sd.each(plugin:getSelectedObjects(), function(x) x:setSelected(false) end)
+
+	-- Get the wall geometries
 	local wallGeoms = sd.map(sd.copy(walls), function (x) return x:getGeom() end)
-	local zoneGeoms = sd.map(sd.copy(zones), function (x) return x:getGeom() end)
-	sd.each(zones, function(x) x:removeFromGame() end)
 
-	-- Perform the operation
-	local results = Geom.clipPolygons(ClipType.Difference, zoneGeoms, wallGeoms, true)
+	local totalResults = 0
+	sd.each(zones, function(oldZone)
+		-- Perform the operation
+		local zoneGeom = oldZone:getGeom()
+		local results = Geom.clipPolygons(ClipType.Difference, { zoneGeom }, wallGeoms, true)
 
-	-- Only proceed if the operation succeeded
-	if type(results) == "table" then
-
-		-- Deselect all objects
-		sd.each(plugin:getSelectedObjects(), function(x) x:setSelected(false) end)
-
-		-- Create the output Zones and select them
-		sd.each(results, function(x)
-			local zone = Zone.new(x)
-			bf:addItem(zone)
-			zone:setSelected(true)
+		-- Create the output zones and select them
+		sd.each(results, function(result)
+			local newZone = sd.clone(oldZone)
+			newZone:setGeom(result)
+			bf:addItem(newZone)
+			newZone:setSelected(true)
 		end)
 
-		-- Let the user know how it went
-		plugin:showMessage("Created " .. sd.plural(#results, "zone"), true)
-	else
-		plugin:showMessage("Operation failed", false)
-	end
+		totalResults = totalResults + #results
+
+		oldZone:removeFromGame()
+	end)
+
+	-- Let the user know how it went
+	plugin:showMessage("Created " .. sd.plural(totalResults, "zone"), true)
 end
 
