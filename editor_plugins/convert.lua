@@ -49,8 +49,7 @@ function main()
   for _, obj in pairs(objects) do
     obj:setSelected(false)
     local geom = obj:getGeom()
-    local constructor = loadstring("return " .. objectType .. ".new")()
-    local newObj = constructor()
+    local newObj = _G[objectType].new()
 
     if type(geom) == "table" then
       -- add or remove closing point as needed
