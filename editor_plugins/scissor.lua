@@ -5,6 +5,7 @@
 -- Authored by kaen
 
 local sd = require('stardust')
+local objects
 
 function hasPolyGeom(object)
 	return type(object.getGeom) == "function" and type(object:getGeom()) == "table"
@@ -13,14 +14,13 @@ end
 function getArgsMenu()
 
 	local menu = nil
-	local objects = plugin:getSelectedObjects()
-	sd.filter(objects, hasPolyGeom)
+	objects = sd.filter(plugin:getSelectedObjects(), hasPolyGeom)
 
 	-- Return nil for menu arguments if the selection is invalid, causing main
 	-- to execute immediately when activated and fail with a useful error
 	-- message. Saves the user from filling out the dialog when his input is
 	-- already provably invalid.
-	if #objects > 1 then
+	if #objects > 2 then
 
 		menu = 	{
 			ToggleMenuItem.new("Subtract: ", { "First From Others", "Others From First" }, 1, false, "(B ... Z) - A or A - (B ... Z)"),
@@ -34,11 +34,12 @@ end
 
 function main()
 
-	local firstIsSubject   = table.remove(arg, 1) == "Others From First"
-	local deleteSubtracted = table.remove(arg, 1) == "Yes"
-	local objects          = sd.filter(plugin:getSelectedObjects(), hasPolyGeom)
+	local autoMode         = #objects == 2
+	local firstIsSubject   = autoMode or (table.remove(arg, 1) == "Others From First")
+	local deleteSubtracted = autoMode or (table.remove(arg, 1) == "Yes")
 	local firstGeom        = nil
 	local firstObject      = nil
+
 
 	-- Make sure we have valid inputs
 	if #objects < 2 then
