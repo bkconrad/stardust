@@ -6,15 +6,11 @@
 
 local sd = require('stardust')
 
-function hasPolyGeom(object)
-	return type(object.getGeom) == "function" and type(object:getGeom()) == "table"
-end
-
 function getArgsMenu()
 
 	local menu = nil
 	local objects = plugin:getSelectedObjects()
-	sd.filter(objects, hasPolyGeom)
+	sd.filter(objects, sd.hasPolyGeom)
 
 	-- Return nil for menu arguments if the selection is invalid, causing main
 	-- to execute immediately when activated and fail with a useful error
@@ -46,7 +42,7 @@ function main()
 	-- Find first valid polygonal object
 	while (firstGeom == nil) and (#objects > 0) do
 		local object = table.remove(objects, 1)
-		if hasPolyGeom(object) then
+		if sd.hasPolyGeom(object) then
 			firstObject = object
 			firstGeom = object:getGeom()
 
@@ -59,7 +55,7 @@ function main()
 	end
 
 	-- Remove objects without polygon geometry
-	sd.filter(objects, hasPolyGeom)
+	sd.filter(objects, sd.hasPolyGeom)
 
 	-- Make sure we have valid inputs
 	if (firstGeom == nil) or (#objects < 1) then

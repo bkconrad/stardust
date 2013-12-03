@@ -933,6 +933,11 @@ local function clone(obj)
 	return result
 end
 
+
+local function hasPolyGeom(object)
+	return type(object.getGeom) == "function" and type(object:getGeom()) == "table"
+end
+
 sd = {
 	align                       = align,
 	alignTo                     = alignTo,
@@ -955,6 +960,7 @@ sd = {
 	getPoint                    = getPoint,
 	getPoints                   = getPoints,
 	halfSize                    = halfSize,
+	hasPolyGeom                 = hasPolyGeom,
 	implicitlyClosed            = implicitlyClosed,
 	invert                      = invert,
 	is                          = is,
