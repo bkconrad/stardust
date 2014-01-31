@@ -27,8 +27,11 @@ function getArgsMenu()
   if #options > 0 then
     menu[1] = ToggleMenuItem.new("Filter by Type:", options, 1, "The desired object type")
   end
+  
+  actions = {"Keep", "Deselect"}
+  menu[2] = ToggleMenuItem.new("Action:", actions, 1, "The action to perform")
 
-	return "Filter Selection", "Deselect objects other than the specified type", "Ctrl+Shift+F", menu
+  return "Filter Selection", "Deselect or keep the specified object type", "Ctrl+Shift+F", menu
 end
 
 function main()
@@ -40,10 +43,19 @@ function main()
   end
 
   local objectType = table.remove(arg, 1)
+  local action = table.remove(arg, 1)
 
-  for _, obj in pairs(objects) do
-    if obj:getObjType() ~= ObjType[objectType] then
-      obj:setSelected(false)
+  if action == "Keep" then
+    for _, obj in pairs(objects) do
+      if obj:getObjType() ~= ObjType[objectType] then
+        obj:setSelected(false)
+      end
+    end
+  elseif action == "Deselect" then
+    for _, obj in pairs(objects) do
+      if obj:getObjType() == ObjType[objectType] then
+        obj:setSelected(false)
+      end
     end
   end
 end   
