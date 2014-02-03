@@ -140,7 +140,6 @@ local function is(...)
 	local objects = { }
 
 	for _, v in pairs(arg) do
-		print(CLASS_TO_OBJTYPE[v])
 		if type(v) == "userdata" then
 			table.insert(objects, v)
 		elseif type(v) == "number" then
@@ -477,7 +476,7 @@ local function edgePos(obj, edge)
   elseif edge == EDGE.MIDDLE then return (ext.miny + ext.maxy) / 2
   elseif edge == EDGE.TOP    then return ext.maxy
   else
-  	print('Unknown edge ' .. edge)
+  	complain('Unknown edge ' .. edge)
   end
 end
 
@@ -547,8 +546,6 @@ local function alignTo(obj, pos, edge)
 	local offset = pos - edgePos(obj, edge)
 	local geom = obj:getGeom()
 
-	print('aligning to ' .. pos .. ' by ' .. offset .. ' along ' .. axis)
-
 	if axis == 'x' then
 		geom = Geom.translate(geom, offset, 0)
 	elseif axis == 'y' then
@@ -556,8 +553,6 @@ local function alignTo(obj, pos, edge)
 	else
 		error('No axis for edge ' .. edge)
 	end
-
-	print(geom)
 
 	obj:setGeom(geom)
 end
