@@ -39,7 +39,6 @@ function main()
 			geom = sd.subdividePolyline(geom, maxDistance, smoothing, completely == "Yes")
 
 			-- Remove duplicate vertexes from implicitly closed types
-			print('dist' .. point.distanceTo(geom[1], geom[#geom]))
 			while sd.implicitlyClosed(v) and point.distanceTo(geom[1], geom[#geom]) < 1 do
 				table.remove(geom, #geom)
 			end
