@@ -30,7 +30,7 @@ function main()
 	sd.each(plugin:getSelectedObjects(), function(x) x:setSelected(false) end)
 
 	-- Merge polygons to get outlines and holes
-	local results = Geom.clipPolygonsAsTree(ClipType.Union, geoms, { })
+	local results = Geom.clipPolygonsAsTree(ClipType.Union, { }, geoms)
 
 	-- Make the lines
 	createLines(results)
