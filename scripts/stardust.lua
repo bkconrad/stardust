@@ -11,7 +11,7 @@ local VALID_TYPES = {
   "FlagSpawn",
   "ForceFieldProjector",
   "GoalZone",
-  "Line",
+  "LineItem",
   "LoadoutZone",
   "Mine",
   "Nexus",

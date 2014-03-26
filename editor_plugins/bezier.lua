@@ -14,10 +14,10 @@ IMPLICITLY_CLOSED_CLASS_IDS = {
 function getArgsMenu()
 
   menu = {
-    CounterMenuItem.new("Subdivisions", 32, 1, 1, 0xFFFF, "", ""                 , "Number of points in the generated objects"), 
-    CounterMenuItem.new("Bezier Power", 20, 1, 1, 0xFF  , "", "No Bezier fitting", "Strength of Bezier curve fitting"), 
+    CounterMenuItem.new("Points", 100, 1, 1, 0xFFFF, "", ""                 , "Number of points in the generated objects"), 
+    CounterMenuItem.new("Curviness", 40, 1, 1, 1000  , "", "No curve", "Strength of Bezier curve fitting"), 
   }
-  return "Bezier Curve Fitter", "Fit curve to polygons", "Ctrl+Shift+]", menu
+  return "Curvify", "Fit curve to polygons", "Ctrl+Shift+]", menu
 end
 
 function fitBezier(poly, subdivisions, power)
