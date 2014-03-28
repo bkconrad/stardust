@@ -181,6 +181,12 @@ local function append(t1, t2)
 	end
 end
 
+local function prepend(t1, t2)
+	for i = #t2,1,-1 do
+		table.insert(t1, t2[i], 1)
+	end
+end
+
 -- removes all t[k] where predicate(t[k]) == false
 local function filter(t, predicate)
 	local j = 1
@@ -352,7 +358,7 @@ local function align(objects, alignment)
 			centerOn(obj, point.new(ext.minx + h.x, c.y))
 		elseif alignment == "Right" then
 			centerOn(obj, point.new(ext.maxx - h.x, c.y))
-		elseif alignment == "c" then
+		elseif alignment == "Center" then
 			centerOn(obj, point.new(ext.minx + (ext.maxx - ext.minx) / 2, c.y))
 		elseif alignment == "Top" then
 			centerOn(obj, point.new(c.x, ext.miny + h.y))
@@ -967,6 +973,7 @@ sd = {
 	mergeExtents                = mergeExtents,
 	midPoint                    = midPoint,
 	minimumDistance             = minimumDistance,
+	prepend                     = prepend,
 	plural                      = plural,
 	polarClamp                  = polarClamp,
 	rdp_simplify                = rdp_simplify,
