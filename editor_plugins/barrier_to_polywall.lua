@@ -29,7 +29,7 @@ function main()
 		end
 
 		-- get the barrier's skeleton
-		local width = barrier:getWidth()
+		local width = barrier:getWidth() / 2
 		local geom = constructBarrierEndPoints(barrier:getGeom(), width)
 		local segments = { }
 

@@ -931,6 +931,11 @@ local function clone(obj)
 	pcall(function() result:setWidth(obj:getWidth()) end)
 	pcall(function() result:setTeam(obj:getTeamIndex()) end)
 	pcall(function() result:setText(obj:getText()) end)
+	pcall(function() result:setRegenTime(obj:getRegenTime()) end)
+	pcall(function() result:setHealRate(obj:getHealRate()) end)
+	pcall(function() result:setSpeed(obj:getSpeed()) end)
+	pcall(function() result:setSlipFactor(obj:getSlipFactor()) end)
+	pcall(function() result:setSnapping(obj:getSnapping()) end)
 	return result
 end
 
