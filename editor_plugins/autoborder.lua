@@ -27,6 +27,11 @@ end
 
 function main()
 	local geoms = sd.map(sd.filter(plugin:getSelectedObjects(), sd.hasPolyGeom), function(x) return x:getGeom() end)
+	if #geoms == 0 then
+		plugin:showMessage('Please select at least one polygon', false)
+		return
+	end
+
 	local ext = sd.mergeExtents(sd.filter(plugin:getSelectedObjects(), sd.hasPolyGeom))
 
 	-- Deselect all objects
