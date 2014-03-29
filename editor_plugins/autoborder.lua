@@ -37,7 +37,6 @@ function main()
 	-- Deselect all objects
 	sd.each(plugin:getSelectedObjects(), function(x) x:setSelected(false) end)
 
-
 	local OUTLINE_PADDING = 50
 	local outline = {
 		point.new(ext.minx - OUTLINE_PADDING, ext.miny - OUTLINE_PADDING),
