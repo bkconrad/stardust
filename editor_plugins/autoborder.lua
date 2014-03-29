@@ -7,7 +7,7 @@
 local sd = require('stardust')
 
 function getArgsMenu()
-	return "AutoBorder", "Create LineItems on the edges of polygons", "Ctrl+Shift+B"
+	return "AutoBorder", "Create LineItems on the edges of polygons", "Ctrl+B"
 end
 
 function createLines(t, skip)
