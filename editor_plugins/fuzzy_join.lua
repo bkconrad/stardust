@@ -7,6 +7,7 @@ function main()
 	local objects = plugin:getSelectedObjects()
 	local joinOccured = true
 	objects = sd.keep(objects, WallItem)
+  print(#objects)
 
 	while joinOccured do
 		joinOccured = false
@@ -46,11 +47,9 @@ function fuzzyJoin(a, b)
 	-- check end point connections
 	for aIndex=1,#a,#a-1 do
 		for bIndex=1,#b,#b-1 do
-
-			print()
-			print(#b)
-			print(bIndex)
-
+      print()
+      print(aIndex)
+      print(bIndex)
 			-- TODO: average join point
 			if point.distSquared(a[aIndex], b[bIndex]) <= delta then
 				local first, last
@@ -70,26 +69,10 @@ function fuzzyJoin(a, b)
 				table.remove(first, #first)
 				table.remove(last, 1)
 
-				return concat(first, mid, last)
+				return sd.concat(first, mid, last)
 			end
 		end
 	end
-end
-
-function concat(...)
-	local result = {}
-
-	for i=1,#arg do
-		local t = arg[i]
-		if type(t) == 'table' then
-			for j=1,#t do
-				table.insert(result, t[j])
-			end
-		else
-			table.insert(result, t)
-		end
-	end
-	return result
 end
 
 function midpoint(a, b)

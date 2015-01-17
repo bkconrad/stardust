@@ -142,7 +142,7 @@ local function is(...)
 	local objTypes = { }
 	local objects = { }
 
-	for _, v in pairs(arg) do
+	for _, v in pairs({...}) do
 		if type(v) == "userdata" then
 			table.insert(objects, v)
 		elseif type(v) == "number" then
@@ -190,6 +190,23 @@ local function prepend(t1, t2)
 	end
 end
 
+function concat(...)
+	local result = {}
+  local arg = { ... }
+
+	for i=1,#arg do
+		local t = arg[i]
+		if type(t) == 'table' then
+			for j=1,#t do
+				table.insert(result, t[j])
+			end
+		else
+			table.insert(result, t)
+		end
+	end
+	return result
+end
+
 -- removes all t[k] where predicate(t[k]) == false
 local function filter(t, predicate)
 	local j = 1
@@ -212,7 +229,8 @@ end
 
 -- Keep all objects in `t` which are of one of the Classes or ObjTypes given
 local function keep(t, ...)
-	filter(t, function(x) return is(x, unpack(arg)) end)
+  local varargs = { ... }
+	filter(t, function(x) return is(x, unpack(varargs)) end)
 	return t
 end
 
@@ -300,13 +318,13 @@ end
 
 -- returns `true` if arg is an object which is a zone, or an ObjType
 -- corresponding to a zone type. `false` otherwise.
-local function isZone(arg)
+local function isZone(val)
 	local result = false
 
-	if type(arg) == "number" then
-		result = not not ZONE_CLASS_IDS[arg]
-	elseif type(arg) == "userdata" and type(arg.getObjType) == "function" then
-		result = not not ZONE_CLASS_IDS[arg:getObjType()]
+	if type(val) == "number" then
+		result = not not ZONE_CLASS_IDS[val]
+	elseif type(val) == "userdata" and type(val.getObjType) == "function" then
+		result = not not ZONE_CLASS_IDS[val:getObjType()]
 	end
 
 	return result
@@ -957,6 +975,7 @@ sd = {
 	centerOn                    = centerOn,
 	clone                       = clone,
 	complain                    = complain,
+	concat                      = concat,
 	copy                        = copy,
 	distribute                  = distribute,
 	each                        = each,
