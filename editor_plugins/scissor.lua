@@ -66,6 +66,9 @@ function main()
 			-- Create the output objects
 			for _, poly in ipairs(result) do
 				local new = sd.clone(firstObject)
+        if not sd.implicitlyClosed(new) then
+          table.insert(poly, poly[1])
+        end
 				new:setGeom(poly)
 				bf:addItem(new)
 			end
@@ -85,6 +88,9 @@ function main()
 			local result = Geom.clipPolygons(ClipType.Difference, { object:getGeom() }, { firstGeom }, true)
 			for _, poly in ipairs(result) do
 				local new = sd.clone(object)
+        if not sd.implicitlyClosed(new) then
+          table.insert(poly, poly[1])
+        end
 				new:setGeom(poly)
 				bf:addItem(new)
 			end
