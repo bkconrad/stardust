@@ -30,35 +30,17 @@ function main()
 		return
 	end
 	
-	
-	-- Analyze if all are a single type
-	for _, obj in pairs(objects) do
-		if not sd.implicitlyClosed(obj) then
-			plugin:showMessage("Operation failed.  Non-polygon objects are selected", false)
-			return
-		end
-	end
-	
-	
 	-- Process all polygons together as a set
 	if processTogether == "Yes" then
-		local typeId = nil
-		
-		-- Analyze if all are a single type
-		for _, obj in pairs(objects) do
-			if typeId == nil then
-				typeId = obj:getObjType()
-			end
-			
-			if typeId ~= obj:getObjType() then
-				plugin:showMessage("Operation failed.  Objects are not the same type", false)
-				return
-			end
-		end
+		local typeId = objects[1]:getObjType()
 		
 		local polySet = {}
 		-- Now build a list of polygons
 		for _, obj in pairs(objects) do
+      local geom = obj:getGeom()
+      if point.distanceTo(geom[1], geom[#geom]) < 1 then
+        table.remove(geom, #geom)
+      end
 			table.insert(polySet, obj:getGeom())
 		end
 		
@@ -92,6 +74,9 @@ function main()
 			local typeId = obj:getObjType()
 			local geom = obj:getGeom()
 			local team = obj:getTeamIndex()
+      if point.distanceTo(geom[1], geom[#geom]) < 1 then
+        table.remove(geom, #geom)
+      end
 			
 			local result = Geom.offsetPolygons(offsetAmount, {geom})
 			
