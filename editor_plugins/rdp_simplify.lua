@@ -23,7 +23,7 @@ function main()
 		if type(v:getGeom()) == "table" then
 			local geom = v:getGeom()
 			local closed = false
-			if geom[1] == geom[#geom] then
+			if sd.reallyClose(geom[1], geom[#geom]) then
 				table.remove(geom, #geom)
 				closed = true
 			end
