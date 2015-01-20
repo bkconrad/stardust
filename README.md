@@ -6,7 +6,7 @@ Installation
 
  1. Download the zip
  - Unpack it
- - Find your bifighter resource directory (it contains `bitfighter.ini`)
+ - Find your bifighter resource directory (hit F7 twice, it is the Root Data Dir)
  - Put editor plugins in `editor_plugins`
  - Put scripts in `scripts`
 
