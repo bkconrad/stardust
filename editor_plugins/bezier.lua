@@ -25,12 +25,6 @@ function fitBezier(poly, subdivisions, power)
     return
   end
 
-  -- true if the polygon's start and end are equal
-  local inputClosed = false
-  if poly[1] == poly[#poly] then
-    inputClosed = true
-  end
-
   local newPoly = {}
   local totalLength = sd.lengthOf(poly)
 
@@ -49,7 +43,7 @@ function fitBezier(poly, subdivisions, power)
   end
 
   -- if the input poly is closed, close the output poly
-  if poly[1] == poly[#poly] then
+  if sd.reallyClose(poly[1], poly[#poly]) then
     table.insert(newPoly, newPoly[1])
   end
 

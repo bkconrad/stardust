@@ -411,13 +411,17 @@ local function evaluateCubicBezier(points, t, power)
   return point.new(x, y)
 end
 
+function reallyClose(p1, p2)
+  return point.distSquared(p1, p2) < 1
+end
+
 -- return point i from poly, handling bounds crossing appropriately depending
 -- on whether the polygon is closed or not
 local function getPoint(poly, i)
   local result
   local closed = false
 
-  if poly[1] == poly[#poly] then
+  if point.distSquared(poly[1], poly[#poly]) < 1 then
     closed = true
   end
 
@@ -425,13 +429,13 @@ local function getPoint(poly, i)
     if closed then
       result = poly[#poly + i - 1]
     else
-      result = poly[#poly + i]
+      result = poly[1]
     end
   elseif i > #poly then
     if closed then
       result = poly[i - #poly + 1]
     else
-      result = poly[i - #poly]
+      result = poly[#poly]
     end
   else
     result = poly[i]
@@ -1004,6 +1008,7 @@ sd = {
 	plural                      = plural,
 	polarClamp                  = polarClamp,
 	rdp_simplify                = rdp_simplify,
+  reallyClose                 = reallyClose,
 	reverse                     = reverse,
 	segmentAt                   = segmentAt,
 	simplify                    = simplify,
