@@ -14,5 +14,5 @@ Usage
 ---
 
 No configuration is needed to use the plugins. Once you have copied the scripts
-and editor plugins to the appropriate directories, they will show up on the F9
+and editor plugins to the appropriate directories, they will show up on the F4
 panel in the editor.
