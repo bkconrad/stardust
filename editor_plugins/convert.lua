@@ -42,7 +42,7 @@ function main()
         if not sd.implicitlyClosed(newObj) then
           table.insert(geom, geom[1])
         end
-      elseif geom[1] == geom[#geom] then
+      elseif sd.reallyClose(geom[1], geom[#geom]) then
         if sd.implicitlyClosed(newObj) then
           table.remove(geom, #geom)
         end
