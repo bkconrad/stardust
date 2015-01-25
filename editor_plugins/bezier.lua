@@ -29,7 +29,7 @@ function fitBezier(poly, subdivisions, power)
   local totalLength = sd.lengthOf(poly)
 
   local t = 0.0
-  while t < 1.0 do
+  while t <= 1.0 do
     -- find the segment in which t lies
     local segment, segmentStart, segmentEnd = sd.segmentAt(poly, t)
     local segment_t = (t - segmentStart) / (segmentEnd - segmentStart)
@@ -67,6 +67,9 @@ function main()
       table.insert(geom, geom[1])
     end
     newGeom = fitBezier(geom, subdivisions, power)
+    if not sd.implicitlyClosed(v) then
+      table.insert(newGeom, geom[#geom])
+    end
     if newGeom then
       v:setGeom(newGeom)
     end
